@@ -12,7 +12,13 @@
     "file-manager"
   ],
   "license": "MIT",
+  "main": [
+    "./src/js/begard.js"
+  ],
+  "ignore": [  
+  ],
   "dependencies": {
-    "jquery": "1"
+    "jquery": "1",
+    "underscore": "~1.8.3"
   }
 }

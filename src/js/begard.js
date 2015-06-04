@@ -15,7 +15,8 @@
                 remote: '',
                 method: 'POST',
                 templates: {
-                    directory: '<li><a href="#" class="begard-directory" data-path="{data-path}">{folder-name}</a></li>'
+                    directory: '<div class="begard-directory"><a href="#" class="begard-directory" data-path="{data-path}">{folder-name}</a></div>',
+                    file: '<div class="begard-file {file-extension}-ext"><ul><li>{file-name}</li><li>{file-size}</li><li>{file-extension}</li></ul></div>'
                 }
             },
 
@@ -69,12 +70,26 @@
 
             refreshView: function(path) {
                 b.refreshFolders(path);
+                b.refreshFiles(path);
             },
 
             openFolder: function(e, self) {
                 var path = self.attr('data-path');
 
                 b.getData(path);
+            },
+
+            refreshFiles: function(path) {
+                $('#begard-files .begard-file').remove();
+                $.each(b.data[path].files, function(index, file) {
+
+                    //Add file to html
+                    var template = b.options.templates.file;
+                    template = template.replace(new RegExp('{file-name}', 'g'), file.name);
+                    template = template.replace(new RegExp('{file-size}', 'g'), file.size);
+                    template = template.replace(new RegExp('{file-extension}', 'g'), file.extension);
+                    $('#begard-files').append(template);
+                });
             },
 
             /**
@@ -91,9 +106,9 @@
 
                     //Add directory to html
                     var template = b.options.templates.directory;
-                    template = template.replace('{data-path}', basePath);
-                    template = template.replace('{folder-name}', folderName);
-                    $('#begard-directories ul').append(template);
+                    template = template.replace(new RegExp('{data-path}', 'g'), basePath);
+                    template = template.replace(new RegExp('{folder-name}', 'g'), folderName);
+                    $('#begard-directories').append(template);
                 });
             },
         };

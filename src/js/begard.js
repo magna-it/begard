@@ -15,8 +15,8 @@
                 remote: '',
                 method: 'POST',
                 templates: {
-                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="#">{folder-name}</a></div>',
-                    file: '<div class="begard-file {file-extension}-ext"><ul><li>{file-name}</li><li>{file-size}</li><li>{file-extension}</li></ul></div>'
+                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="#"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
+                    file: '<div class="begard-file"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li><li>{file-size}</li></ul></div>'
                 }
             },
 

@@ -14,6 +14,33 @@
     float: right;
     margin: 2px;
 }
-.begard-file {
+
+.begard-file, .begard-directory {
     float: left;
+    margin: 5px;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+}
+.begard-file ul, .begard-directory ul {
+    list-style: none;
+}
+.begard-file li, .begard-directory li {
+    text-align: center;
+}
+.begard-file .icon, .begard-directory .icon {
+    font-size: 45px;
+}
+
+
+.begard-file .icon .fa:before {
+    content: '\f15b';
+}
+.begard-file .fa.php-ext:before,
+.begard-file .fa.js-ext:before
+.begard-file .fa.css-ext:before {
+    content: '\f1c9';
+}
+.begard-file .fa.ini-ext:before {
+    content: '\f0f6';
 }

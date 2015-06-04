@@ -1,0 +1,19 @@
+#begard {
+    width: 100%;
+    height: 400px;
+}
+#begard-header {
+    padding: 5px;
+    background: #f9f9f9;
+}
+#begard-content {
+    border: solid 2px #f9f9f9;
+    padding: 5px;
+}
+#begard-upload, #begard-close {
+    float: right;
+    margin: 2px;
+}
+.begard-file {
+    float: left;
+}

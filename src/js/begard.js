@@ -15,7 +15,7 @@
                 remote: '',
                 method: 'POST',
                 templates: {
-                    directory: '<div class="begard-directory"><a href="#" class="begard-directory" data-path="{data-path}">{folder-name}</a></div>',
+                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="#">{folder-name}</a></div>',
                     file: '<div class="begard-file {file-extension}-ext"><ul><li>{file-name}</li><li>{file-size}</li><li>{file-extension}</li></ul></div>'
                 }
             },
@@ -26,22 +26,29 @@
             data: [],
 
             /**
+             * Keep current path
+             */
+            currentPath: '',
+
+            /**
              * Initialize begard
              */
             init: function() {
                 b.handleEvents();
-                b.getData('/');
+                b.openFolder('/');
             },
 
             /**
              * Handle events
              */
             handleEvents: function() {
-                $(document).on('click', '.begard-directory', function(e) { var self = $(this); b.openFolder(e, self); });
+                $(document).on('click', '.begard-directory', function(e) { var self = $(this); b.openFolderEvent(e, self); });
+                $(document).on('click', '#begard-up', function(e) { var self = $(this); b.upDirectoryEvent(e, self); });
             },
 
             /**
              * Get data for specific path
+             * @param {string} path
              */
             getData: function(path) {
                 $.ajax({
@@ -56,6 +63,8 @@
                     delete data.path;
 
                     b.data[path] = data;
+
+                    b.refreshVars(path);
                     b.refreshView(path);
                 });
             },
@@ -68,17 +77,86 @@
 
             },
 
+            /**
+             * Refresh variables
+             * @param {string} path
+             */
+            refreshVars: function(path) {
+                b.currentPath = path;
+            },
+
+            /**
+             * Refresh view
+             * @param {string} path
+             */
             refreshView: function(path) {
                 b.refreshFolders(path);
                 b.refreshFiles(path);
+                b.checkUpDirectory(path);
             },
 
-            openFolder: function(e, self) {
+            /**
+             * Open a folder by given path
+             * @param {string} path
+             */
+            openFolder: function(path) {
+                //If data is already taken, Do not take again
+                if (typeof b.data[path] != "undefined") {
+                    b.refreshVars(path);
+                    b.refreshView(path);
+                } else {
+                    b.getData(path);
+                }
+            },
+
+            /**
+             * Open a folder event when user click on a directory
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            openFolderEvent: function(e, self) {
                 var path = self.attr('data-path');
 
-                b.getData(path);
+                b.openFolder(path);
             },
 
+            /**
+             * Open a folder and refresh view
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            upDirectoryEvent: function(e, self) {
+                if (b.currentPath !== '/') {
+
+                    //Remove last folder from path
+                    encodedPath = encodeURIComponent(b.currentPath);
+                    slashLastIndex = encodedPath.lastIndexOf('%2F');
+                    decodedPath = encodedPath.substr(0, slashLastIndex);
+                    upPath = decodeURIComponent(decodedPath);
+
+                    //If upPath is empty so this is root
+                    if (upPath === "") upPath = "/";
+
+                    b.openFolder(upPath);
+                }
+            },
+
+            /**
+             * Define status of up button
+             * @param {string} path
+             */
+            checkUpDirectory: function(path) {
+                if (b.currentPath === '/') {
+                    $('#begard-up').attr('disabled', 'disabled').addClass('disabled');
+                } else {
+                    $('#begard-up').removeAttr('disabled').removeClass('disabled');
+                }
+            },
+
+            /**
+             * Refresh file list by given path
+             * @param {string} path
+             */
             refreshFiles: function(path) {
                 $('#begard-files .begard-file').remove();
                 $.each(b.data[path].files, function(index, file) {
@@ -97,7 +175,7 @@
              * @param {string} path
              */
             refreshFolders: function(path) {
-                $('#begard-directories ul li').remove();
+                $('#begard-directories .begard-directory').remove();
                 $.each(b.data[path].directories, function(index, folderName) {
 
                     //Do not add extra slash when path is root

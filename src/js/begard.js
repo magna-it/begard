@@ -43,9 +43,9 @@
              * Handle events
              */
             handleEvents: function() {
-                $(document).on('click', '.begard-directory', function(e) { var self = $(this); b.openFolderEvent(e, self); });
-                $(document).on('click', '.begard-crumb-to', function(e) { var self = $(this); b.openFolderEvent(e, self); });
-                $(document).on('click', '#begard-up', function(e) { var self = $(this); b.upDirectoryEvent(e, self); });
+                $(document).on('click', '.begard-directory', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click', '.begard-crumb-to', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click', '#begard-up', function(e) { b.upDirectoryEvent(e, $(this)); });
             },
 
             /**
@@ -191,6 +191,9 @@
                 });
             },
 
+            /**
+             * Refresh breadcrumb
+             */
             refreshBreadcrumb: function() {
                 var directories = b.currentPath.split('/');
                 var sDirectories = [];

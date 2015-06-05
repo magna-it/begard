@@ -15,6 +15,15 @@
     margin: 2px;
 }
 
+#begard-addressbar {
+    padding: 5px;
+    background: #f9f9f9;
+}
+#begard-breadcrumb {
+    margin-bottom: 0px;
+    background: #fff;
+}
+
 .begard-file, .begard-directory {
     float: left;
     margin: 5px;
@@ -37,7 +46,7 @@
     content: '\f15b';
 }
 .begard-file .fa.php-ext:before,
-.begard-file .fa.js-ext:before
+.begard-file .fa.js-ext:before,
 .begard-file .fa.css-ext:before {
     content: '\f1c9';
 }

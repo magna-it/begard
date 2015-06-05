@@ -16,7 +16,8 @@
                 method: 'POST',
                 templates: {
                     directory: '<div class="begard-directory" data-path="{data-path}"><a href="#"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
-                    file: '<div class="begard-file"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li><li>{file-size}</li></ul></div>'
+                    file: '<div class="begard-file"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li><li>{file-size}</li></ul></div>',
+                    breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{directory-name}</a></li>'
                 }
             },
 
@@ -43,6 +44,7 @@
              */
             handleEvents: function() {
                 $(document).on('click', '.begard-directory', function(e) { var self = $(this); b.openFolderEvent(e, self); });
+                $(document).on('click', '.begard-crumb-to', function(e) { var self = $(this); b.openFolderEvent(e, self); });
                 $(document).on('click', '#begard-up', function(e) { var self = $(this); b.upDirectoryEvent(e, self); });
             },
 
@@ -93,6 +95,7 @@
                 b.refreshFolders(path);
                 b.refreshFiles(path);
                 b.checkUpDirectory(path);
+                b.refreshBreadcrumb();
             },
 
             /**
@@ -129,10 +132,8 @@
                 if (b.currentPath !== '/') {
 
                     //Remove last folder from path
-                    encodedPath = encodeURIComponent(b.currentPath);
-                    slashLastIndex = encodedPath.lastIndexOf('%2F');
-                    decodedPath = encodedPath.substr(0, slashLastIndex);
-                    upPath = decodeURIComponent(decodedPath);
+                    lastIndexSlash = b.currentPath.lastIndexOf('/');
+                    upPath = b.currentPath.substr(0, lastIndexSlash);
 
                     //If upPath is empty so this is root
                     if (upPath === "") upPath = "/";
@@ -176,19 +177,51 @@
              */
             refreshFolders: function(path) {
                 $('#begard-directories .begard-directory').remove();
-                $.each(b.data[path].directories, function(index, folderName) {
+                $.each(b.data[path].directories, function(index, directoryName) {
 
                     //Do not add extra slash when path is root
-                    if (path !== '/')   basePath = path + '/' + folderName;
-                    else                basePath = path + folderName;
+                    if (path !== '/')   basePath = path + '/' + directoryName;
+                    else                basePath = path + directoryName;
 
                     //Add directory to html
                     var template = b.options.templates.directory;
                     template = template.replace(new RegExp('{data-path}', 'g'), basePath);
-                    template = template.replace(new RegExp('{folder-name}', 'g'), folderName);
+                    template = template.replace(new RegExp('{folder-name}', 'g'), directoryName);
                     $('#begard-directories').append(template);
                 });
             },
+
+            refreshBreadcrumb: function() {
+                var directories = b.currentPath.split('/');
+                var sDirectories = [];
+                $.each(directories, function(index, directoryName) {
+                    if (directoryName !== "") sDirectories.push(directoryName);
+                });
+
+                $('#begard-breadcrumb .begard-crumb').remove();
+
+                var path = '/';
+
+                //Add root breadcrumb
+                var template = b.options.templates.breadcrumb;
+                template = template.replace(new RegExp('{directory-name}', 'g'), '/');
+                template = template.replace(new RegExp('{data-path}', 'g'), path);
+                $('#begard-breadcrumb').append(template);
+
+                //Add other part of path to breadcrumb
+                $.each(sDirectories, function(index, directoryName) {
+
+                    path += directoryName;
+
+                    //Add breadcrumb to html
+                    var template = b.options.templates.breadcrumb;
+                    template = template.replace(new RegExp('{directory-name}', 'g'), directoryName);
+                    template = template.replace(new RegExp('{data-path}', 'g'), path);
+                    $('#begard-breadcrumb').append(template);
+                    path += '/';
+                });
+                $('#begard-breadcrumb .begard-crumb').last().addClass('active');
+            }
         };
 
         return begard = {

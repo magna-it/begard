@@ -14,9 +14,10 @@
             options: {
                 remote: '',
                 method: 'POST',
+                multiSelect: false,
                 templates: {
-                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="#"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
-                    file: '<div class="begard-file"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li><li>{file-size}</li></ul></div>',
+                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
+                    file: '<div class="begard-file" data-path="{data-path}" data-name="{data-name}"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li></ul></div>',
                     breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{directory-name}</a></li>'
                 }
             },
@@ -43,9 +44,13 @@
              * Handle events
              */
             handleEvents: function() {
-                $(document).on('click', '.begard-directory', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('dblclick', '.begard-directory', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click', '.begard-directory', function(e) { b.selectDirectory(e, $(this)); });
+
                 $(document).on('click', '.begard-crumb-to', function(e) { b.openFolderEvent(e, $(this)); });
+
                 $(document).on('click', '#begard-up', function(e) { b.upDirectoryEvent(e, $(this)); });
+
             },
 
             /**
@@ -142,6 +147,15 @@
                 }
             },
 
+            selectDirectory: function(e, self) {
+                if (b.options.multiSelect) {
+                    self.addClass('begard-selected');
+                } else {
+                    $('#begard-directories .begard-selected').removeClass('begard-selected');
+                    self.addClass('begard-selected');
+                }
+            },
+
             /**
              * Define status of up button
              * @param {string} path
@@ -166,6 +180,8 @@
                     var template = b.options.templates.file;
                     template = template.replace(new RegExp('{file-name}', 'g'), file.name);
                     template = template.replace(new RegExp('{file-size}', 'g'), file.size);
+                    template = template.replace(new RegExp('{data-path}', 'g'), path);
+                    template = template.replace(new RegExp('{data-name}', 'g'), file.name);
                     template = template.replace(new RegExp('{file-extension}', 'g'), file.extension);
                     $('#begard-files').append(template);
                 });

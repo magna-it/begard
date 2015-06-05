@@ -1,14 +1,21 @@
 #begard {
     width: 100%;
-    height: 400px;
-}
-#begard-header {
-    padding: 5px;
+    position: absolute;
+    border: solid 5px #F9F9F9;
     background: #f9f9f9;
 }
+#begard-header {
+}
 #begard-content {
-    border: solid 2px #f9f9f9;
-    padding: 5px;
+    float: left;
+}
+#begard-details {
+    float: right;
+    height: 100%;
+}
+.begard-inner {
+    border-radius: 4px;
+    background: #fff;
 }
 #begard-upload, #begard-close {
     float: right;
@@ -16,26 +23,43 @@
 }
 
 #begard-addressbar {
-    padding: 5px;
-    background: #f9f9f9;
+    margin: 5px 0;
 }
 #begard-breadcrumb {
     margin-bottom: 0px;
     background: #fff;
 }
 
+#begard-up.disabled {
+    display: none;
+}
+
+.begard-selected {
+    background: #E0E0E0;
+    border-radius: 3px;
+}
+
 .begard-file, .begard-directory {
     float: left;
     margin: 5px;
+    padding: 5px;
     overflow: hidden;
     width: 100px;
     height: 100px;
 }
 .begard-file ul, .begard-directory ul {
     list-style: none;
+    padding-left: 0;
 }
 .begard-file li, .begard-directory li {
     text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.begard-file a, .begard-directory a {
+    color: #337AB7;
+    text-decoration: none;
 }
 .begard-file .icon, .begard-directory .icon {
     font-size: 45px;

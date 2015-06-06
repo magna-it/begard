@@ -40,13 +40,18 @@
             lastFileId: 0,
 
             /**
+             * List of files and directories selected for operate such as delete, move, copy and paste
+             */
+            willOperate: [],
+
+            /**
              * Initialize begard
              */
             init: function() {
                 b.handleEvents();
                 b.openFolder('/');
 
-                $('#begard-operations').addClass('disabled');
+                b.disableOperations();
             },
 
             /**
@@ -112,6 +117,7 @@
                 b.refreshFiles(path);
                 b.checkUpDirectory(path);
                 b.refreshBreadcrumb();
+                b.disableOperations();
 
                 $('#begard-need-refresh').addClass('disabled');
             },
@@ -151,20 +157,38 @@
                         self.addClass('begard-selected');
                     }
                 }
-                b.refreshDetails();
+                b.refreshFileDetails();
+                b.refreshOperations();
             },
 
             /**
-             * Refresh details
+             * Toggle operations button
              */
-            refreshDetails: function() {
-                var directoriesSelected = $('#begard-directories .begard-selected');
+            refreshOperations: function() {
                 var filesSelected = $('#begard-files .begard-selected');
+                var directoriesSelected = $('#begard-directories .begard-selected');
 
-                if (directoriesSelected.length === 0 && filesSelected.length === 1) {
-                    b.refreshFileDetails();
+                if (filesSelected.length === 0 && directoriesSelected.length === 0) {
+                    $('#begard-operations').addClass('disabled');
                 } else {
-                    $('#begard-file-details').addClass('disabled');
+                    $('#begard-operations').removeClass('disabled');
+
+                    //Toggle rename button
+                    if ((filesSelected.length === 1 && directoriesSelected.length === 0) ||
+                        (filesSelected.length === 0 && directoriesSelected.length === 1)) {
+                        $('#begard-operation-rename').removeClass('disabled');
+                    } else {
+                        $('#begard-operation-rename').addClass('disabled');
+                    }
+
+                    //Toggle copy, move, delete and cut buttons
+                    if (filesSelected.length > 0 || directoriesSelected.length > 0) {
+                        $('#begard-operation-copy').removeClass('disabled');
+                        $('#begard-operation-move').removeClass('disabled');
+                        $('#begard-operation-delete').removeClass('disabled');
+                        $('#begard-operation-cut').removeClass('disabled');
+
+                    }
                 }
             },
 
@@ -172,21 +196,40 @@
              * Refresh file details
              */
             refreshFileDetails: function() {
-                $('#begard-file-details').children().remove();
+                var directoriesSelected = $('#begard-directories .begard-selected');
+                var filesSelected = $('#begard-files .begard-selected');
 
-                var fileSelected = $('#begard-files .begard-selected');
-                var filePath = fileSelected.attr('data-path');
-                var fileIndex = fileSelected.attr('data-index');
+                if (directoriesSelected.length === 0 && filesSelected.length === 1) {
+                    $('#begard-file-details').children().remove();
 
-                var file = b.data[filePath]['files'][fileIndex];
+                    var fileSelected = $('#begard-files .begard-selected');
+                    var filePath = fileSelected.attr('data-path');
+                    var fileIndex = fileSelected.attr('data-index');
 
-                var template = b.options.templates.fileDetails;
-                template = template.replace(new RegExp('{data-name}', 'g'), file.name);
-                template = template.replace(new RegExp('{data-size}', 'g'), file.size);
-                template = template.replace(new RegExp('{data-extension}', 'g'), file.extension);
-                $('#begard-file-details').append(template);
+                    var file = b.data[filePath]['files'][fileIndex];
 
-                $('#begard-file-details').removeClass('disabled');
+                    var template = b.options.templates.fileDetails;
+                    template = template.replace(new RegExp('{data-name}', 'g'), file.name);
+                    template = template.replace(new RegExp('{data-size}', 'g'), file.size);
+                    template = template.replace(new RegExp('{data-extension}', 'g'), file.extension);
+                    $('#begard-file-details').append(template);
+
+                    $('#begard-file-details').removeClass('disabled');
+                } else {
+                    $('#begard-file-details').addClass('disabled');
+                }
+            },
+
+            /**
+             * Disable operations when view refreshed
+             */
+            disableOperations: function() {
+                $('#begard-operations').addClass('disabled');
+                $('#begard-operation-paste').addClass('disabled');
+                $('#begard-operation-copy').addClass('disabled');
+                $('#begard-operation-rename').addClass('disabled');
+                $('#begard-operation-move').addClass('disabled');
+                $('#begard-operation-delete').addClass('disabled');
             },
 
             /**

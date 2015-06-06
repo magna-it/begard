@@ -1,37 +1,52 @@
 <div id="begard" class="begard-standalone">
-    <div id="begard-header" class="col-md-12">
-        <a id="begard-close" href="#" class="btn btn-warning">Close</a>
-        <a id="begard-upload" href="#" class="btn btn-primary">Upload</a>
-        <h3 id="begard-header-h">Begard</h3>
-    </div>
-    <div id="begard-addressbar" class="col-md-12">
-        <ul id="begard-breadcrumb" class="breadcrumb">
-            <a id="begard-up" href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-arrow-up"></i></a>
-        </ul>
-    </div>
-    <div id="begard-content" class="col-md-9">
-        <div class="begard-inner">
-            <div id="begard-files"></div>
-            <div class="clearfix"></div>
-            <div id="begard-directories"></div>
-            <div class="clearfix"></div>
+    <div class="row">
+        <div id="begard-header" class="col-md-12">
+            <a id="begard-close" href="#" class="btn btn-warning">Close</a>
+            <h3 id="begard-header-h">Begard</h3>
         </div>
-    </div>
-    <div id="begard-details" class="col-md-3">
-        <div class="begard-inner">
-            <h4>Operations</h4>
-            <div id="begard-operations">
-                <div class="text-center">
-                    <div class="btn-group" role="group" class="text-center">
-                      <a href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
-                      <a href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
-                      <a href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
-                      <a href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
-                      <a href="javascript:void(0)" class="btn btn-default" title="Paste"><i class="fa fa-paste"></i></a>
+        <div id="begard-addressbar" class="col-md-12">
+            <ul id="begard-breadcrumb" class="breadcrumb">
+                <a id="begard-up" href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-arrow-up"></i></a>
+            </ul>
+        </div>
+        <div id="begard-content" class="col-md-9">
+            <div class="begard-inner">
+                <a class="btn btn-xs btn-warning" id="begard-need-refresh"><i class="fa fa-refresh"></i></a>
+                <div id="begard-files"></div>
+                <div class="clearfix"></div>
+                <div id="begard-directories"></div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div id="begard-details" class="col-md-3">
+            <div class="begard-inner">
+                <div id="begard-upload">
+                    <h4>Upload</h4>
+                    <div class="text-center">
+                        <a href="#" class="btn btn-primary">
+                            <i class="fa fa-upload"></i>
+                            Select file...
+                            <form id="begard-upload-form">
+                                <input id="begard-upload-input" type="file" name="file">
+                            </form>
+                        </a>
+                    </div>
+                    <div id="begard-upload-list"></div>
+                </div>
+                <div id="begard-operations">
+                    <h4>Operations</h4>
+                    <div class="text-center">
+                        <div class="btn-group" role="group" class="text-center">
+                          <a href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
+                          <a href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
+                          <a href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
+                          <a href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
+                          <a href="javascript:void(0)" class="btn btn-default" title="Paste"><i class="fa fa-paste"></i></a>
+                        </div>
                     </div>
                 </div>
+                <div id="begard-file-details"></div>
             </div>
-            <div id="begard-file-details"></div>
         </div>
     </div>
 </div>

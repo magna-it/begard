@@ -2,10 +2,14 @@
     border: solid 5px #F9F9F9;
     background: #f9f9f9;
 }
+#begard .disabled {
+    display: none;
+}
 #begard-header {
 }
 #begard-content {
     float: left;
+    position: relative;
     padding-right: 0px;
 }
 #begard-details {
@@ -13,12 +17,62 @@
     padding-left: 5px;
     height: 100%;
 }
+#begard-need-refresh {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
 .begard-inner {
     border-radius: 4px;
     background: #fff;
     padding: 5px;
 }
-#begard-upload, #begard-close {
+.begard-upload-error {
+    color: red;
+}
+#begard-upload a {
+    position: relative;
+    overflow: hidden;
+}
+.begard-upload-close {
+    cursor: pointer;
+    position: absolute;
+    left: 0px;
+    top: 3px;
+}
+.begard-upload-item {
+    position: relative;
+    border-bottom: solid 1px #ccc;
+    margin: 10px 0;
+}
+.begard-upload-item:last-child {
+    border-bottom: 0;
+}
+.begard-upload-item ul{
+    list-style: none;
+    padding-left: 15px;
+    margin: 0;
+}
+.begard-upload-item .begard-upload-name{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.begard-upload-item .progress-bar{
+    min-width: 30px;
+    transition: 0;
+    -webkit-transition: 0;
+    -o-ransition: 0;
+}
+#begard-upload input {
+    cursor: pointer;
+    font-size: 200px;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#begard-close {
     float: right;
     margin: 2px;
 }
@@ -34,10 +88,6 @@
 #begard-up.disabled {
     display: none;
 }
-#begard-file-details.disabled {
-    display: none;
-}
-
 .begard-selected {
     background: #E0E0E0;
     border-radius: 3px;

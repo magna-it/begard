@@ -19,7 +19,8 @@
                     directory: '<div class="begard-directory" data-path="{data-path}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
                     file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li></ul></div>',
                     breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{directory-name}</a></li>',
-                    fileDetails: '<h4>Selected file details</h4><ul><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>'
+                    fileDetails: '<h4>Selected file details</h4><ul><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>',
+                    uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled">An error occurred.</li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
                 }
             },
 
@@ -32,6 +33,8 @@
              * Keep current path
              */
             currentPath: '',
+
+            lastFileId: 0,
 
             /**
              * Initialize begard
@@ -46,12 +49,16 @@
              */
             handleEvents: function() {
                 $(document).on('dblclick', '.begard-directory', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click', '.begard-crumb-to', function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click', '#begard-need-refresh', function(e) { b.needRefreshEvent(e, $(this)); });
 
                 $(document).on('click', '.begard-directory', function(e) { b.selectDirectory(e, $(this)); });
                 $(document).on('click', '.begard-file', function(e) { b.selectFile(e, $(this)); });
-                $(document).on('click', '.begard-crumb-to', function(e) { b.openFolderEvent(e, $(this)); });
                 $(document).on('click', '#begard-up', function(e) { b.upDirectoryEvent(e, $(this)); });
 
+                $(document).on('click', '.begard-upload-close', function(e) { b.uploadCloseEvent(e, $(this)); });
+
+                $(document).on('change', '#begard-upload-input', function(e) { b.uploadInputChange(e, $(this)); });
             },
 
             /**
@@ -62,7 +69,8 @@
                 $.ajax({
                     url: b.options.remote,
                     data: {
-                        path: path
+                        path: path,
+                        requestType: 'info'
                     },
                     method: b.options.method,
                     dataType: "json"
@@ -102,6 +110,8 @@
                 b.refreshFiles(path);
                 b.checkUpDirectory(path);
                 b.refreshBreadcrumb();
+
+                $('#begard-need-refresh').addClass('disabled');
             },
 
             refreshDetails: function() {
@@ -154,6 +164,13 @@
              */
             openFolderEvent: function(e, self) {
                 var path = self.attr('data-path');
+
+                b.openFolder(path);
+            },
+
+            needRefreshEvent: function(e, self) {
+                var path = self.attr('data-path');
+                self.addClass('disabled');
 
                 b.openFolder(path);
             },
@@ -294,6 +311,93 @@
                     path += '/';
                 });
                 $('#begard-breadcrumb .begard-crumb').last().addClass('active');
+            },
+
+            uploadInputChange: function(e, self) {
+                var file = e.target.files[0];
+                file.percent = 0;
+                file.id = ++b.lastFileId;
+                b.upload(file);
+            },
+
+            upload: function(file) {
+                b.createUploadItem(file);
+
+                var formData = new FormData;
+                formData.append('file', file);
+                formData.append('path', b.currentPath);
+                formData.append('requestType', 'upload');
+
+                $('#begard-upload-form')[0].reset();
+
+                var jqxhr = $.ajax({
+                    url: b.options.remote,
+                    method: b.options.method,
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    xhr: function() {
+                        var xhr = $.ajaxSettings.xhr();
+                        if (xhr.upload) {
+                            xhr.upload.addEventListener('progress', function(e) {
+                                var percent = 0;
+                                var position = e.loaded || e.position;
+                                var total = e.total;
+                                if (e.lengthComputable) {
+                                    percent = Math.ceil(position / total * 100);
+                                }
+                                file.percent = percent;
+                                b.refreshUploadItem(file);
+                            }, false);
+                        }
+                        return xhr;
+                    }
+                }).done(function(data) {
+                    if (data.status !== 1) {
+                        b.failUploadItem(file);
+                    } else {
+                        var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
+                        uploadItem.addClass('begard-upload-item-succeed');
+
+                        delete b.data[data.path];
+                        if (data.path === b.currentPath) {
+                            $('#begard-need-refresh').attr('data-path', b.currentPath).removeClass('disabled');
+                        }
+                    }
+                }).fail(function(xhr, text) {
+                    b.failUploadItem(file);
+                }).complete(function() {
+                    var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
+                    uploadItem.find('.begard-upload-close').removeClass('disabled');
+                });
+            },
+
+            failUploadItem: function(file) {
+                var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
+                uploadItem.addClass('begard-upload-item-failed').find('.begard-upload-error').removeClass('disabled');
+            },
+
+            createUploadItem: function(file) {
+                $('.begard-upload-item[data-id="' + file.id + '"]').remove();
+
+                var template = b.options.templates.uploadList;
+                template = template.replace(new RegExp('{data-id}', 'g'), file.id);
+                template = template.replace(new RegExp('{data-percent}', 'g'), file.percent);
+                template = template.replace(new RegExp('{data-name}', 'g'), file.name);
+                $('#begard-upload-list').append(template);
+            },
+
+            refreshUploadItem: function(file) {
+                var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
+
+                uploadItem.find('[data-change-percent-width]').css({'width': file.percent + '%'});
+                uploadItem.find('[data-change-percent-text]').text(file.percent + '%');
+            },
+
+            uploadCloseEvent: function(e, self) {
+                self.closest('.begard-upload-item').remove();
             }
         };
 

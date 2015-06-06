@@ -34,6 +34,9 @@
              */
             currentPath: '',
 
+            /**
+             * Give a id to every file upload action
+             */
             lastFileId: 0,
 
             /**
@@ -42,23 +45,22 @@
             init: function() {
                 b.handleEvents();
                 b.openFolder('/');
+
+                $('#begard-operations').addClass('disabled');
             },
 
             /**
              * Handle events
              */
             handleEvents: function() {
-                $(document).on('dblclick', '.begard-directory', function(e) { b.openFolderEvent(e, $(this)); });
-                $(document).on('click', '.begard-crumb-to', function(e) { b.openFolderEvent(e, $(this)); });
-                $(document).on('click', '#begard-need-refresh', function(e) { b.needRefreshEvent(e, $(this)); });
-
-                $(document).on('click', '.begard-directory', function(e) { b.selectDirectory(e, $(this)); });
-                $(document).on('click', '.begard-file', function(e) { b.selectFile(e, $(this)); });
-                $(document).on('click', '#begard-up', function(e) { b.upDirectoryEvent(e, $(this)); });
-
-                $(document).on('click', '.begard-upload-close', function(e) { b.uploadCloseEvent(e, $(this)); });
-
-                $(document).on('change', '#begard-upload-input', function(e) { b.uploadInputChange(e, $(this)); });
+                $(document).on('dblclick', '.begard-directory',    function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click',    '.begard-crumb-to',     function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('click',    '#begard-need-refresh', function(e) { b.needRefreshEvent(e, $(this)); });
+                $(document).on('click',    '.begard-directory',    function(e) { b.selectDirectoryEvent(e, $(this)); });
+                $(document).on('click',    '.begard-file',         function(e) { b.selectFileEvent(e, $(this)); });
+                $(document).on('click',    '#begard-up',           function(e) { b.upDirectoryEvent(e, $(this)); });
+                $(document).on('click',    '.begard-upload-close', function(e) { b.uploadCloseEvent(e, $(this)); });
+                $(document).on('change',   '#begard-upload-input', function(e) { b.uploadInputChangeEvent(e, $(this)); });
             },
 
             /**
@@ -114,6 +116,47 @@
                 $('#begard-need-refresh').addClass('disabled');
             },
 
+            /**
+             * Run when select a directory
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            selectDirectoryEvent: function(e, self) {
+                b.select(e, self, 'directory');
+            },
+
+            /**
+             * Run when select a file
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            selectFileEvent: function(e, self) {
+                b.select(e, self, 'file');
+            },
+
+            /**
+             * Select a directory or file
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             * @param {string} type [file|directory]
+             */
+            select: function(e, self, type) {
+                if (self.hasClass('begard-selected')) {
+                    self.removeClass('begard-selected');
+                } else{
+                    if (b.options.multiSelect) {
+                        self.addClass('begard-selected');
+                    } else {
+                        b.unSelectEveryThing();
+                        self.addClass('begard-selected');
+                    }
+                }
+                b.refreshDetails();
+            },
+
+            /**
+             * Refresh details
+             */
             refreshDetails: function() {
                 var directoriesSelected = $('#begard-directories .begard-selected');
                 var filesSelected = $('#begard-files .begard-selected');
@@ -125,6 +168,9 @@
                 }
             },
 
+            /**
+             * Refresh file details
+             */
             refreshFileDetails: function() {
                 $('#begard-file-details').children().remove();
 
@@ -168,6 +214,11 @@
                 b.openFolder(path);
             },
 
+            /**
+             * Enable need refresh button
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
             needRefreshEvent: function(e, self) {
                 var path = self.attr('data-path');
                 self.addClass('disabled');
@@ -194,34 +245,9 @@
                 }
             },
 
-            selectDirectory: function(e, self) {
-                if (self.hasClass('begard-selected')) {
-                    self.removeClass('begard-selected');
-                } else{
-                    if (b.options.multiSelect) {
-                        self.addClass('begard-selected');
-                    } else {
-                        b.unSelectEveryThing();
-                        self.addClass('begard-selected');
-                    }
-                }
-                b.refreshDetails();
-            },
-
-            selectFile: function(e, self) {
-                if (self.hasClass('begard-selected')) {
-                    self.removeClass('begard-selected');
-                } else{
-                    if (b.options.multiSelect) {
-                        self.addClass('begard-selected');
-                    } else {
-                        b.unSelectEveryThing();
-                        self.addClass('begard-selected');
-                    }
-                }
-                b.refreshDetails();
-            },
-
+            /**
+             * Unselect every directory and file
+             */
             unSelectEveryThing: function() {
                 $('#begard-files .begard-selected').removeClass('begard-selected');
                 $('#begard-directories .begard-selected').removeClass('begard-selected');
@@ -313,13 +339,22 @@
                 $('#begard-breadcrumb .begard-crumb').last().addClass('active');
             },
 
-            uploadInputChange: function(e, self) {
+            /**
+             * Select a file for upload
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            uploadInputChangeEvent: function(e, self) {
                 var file = e.target.files[0];
                 file.percent = 0;
                 file.id = ++b.lastFileId;
                 b.upload(file);
             },
 
+            /**
+             * Upload file
+             * @param {object} file File, file.percent and file.id also need.
+             */
             upload: function(file) {
                 b.createUploadItem(file);
 
@@ -356,7 +391,7 @@
                     }
                 }).done(function(data) {
                     if (data.status !== 1) {
-                        b.failUploadItem(file);
+                        b.failedUploadItem(file);
                     } else {
                         var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
                         uploadItem.addClass('begard-upload-item-succeed');
@@ -367,18 +402,26 @@
                         }
                     }
                 }).fail(function(xhr, text) {
-                    b.failUploadItem(file);
+                    b.failedUploadItem(file);
                 }).complete(function() {
                     var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
                     uploadItem.find('.begard-upload-close').removeClass('disabled');
                 });
             },
 
-            failUploadItem: function(file) {
+            /**
+             * Run when a upload item failed in upload
+             * @param {object} file File
+             */
+            failedUploadItem: function(file) {
                 var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
                 uploadItem.addClass('begard-upload-item-failed').find('.begard-upload-error').removeClass('disabled');
             },
 
+            /**
+             * Create html of upload item
+             * @param {object} file File
+             */
             createUploadItem: function(file) {
                 $('.begard-upload-item[data-id="' + file.id + '"]').remove();
 
@@ -389,6 +432,10 @@
                 $('#begard-upload-list').append(template);
             },
 
+            /**
+             * Refresh percent of upload item in html
+             * @param {object} file File
+             */
             refreshUploadItem: function(file) {
                 var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
 
@@ -396,6 +443,11 @@
                 uploadItem.find('[data-change-percent-text]').text(file.percent + '%');
             },
 
+            /**
+             * Close button event in upload item
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
             uploadCloseEvent: function(e, self) {
                 self.closest('.begard-upload-item').remove();
             }
@@ -420,6 +472,7 @@
                 //Initialize
                 b.init();
 
+                $('#begard-close').addClass('disabled');
 
             },
 

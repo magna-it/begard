@@ -36,6 +36,11 @@
             currentPath: '',
 
             /**
+             * Keep current operation
+             */
+            currentOperation: null,
+
+            /**
              * Give a id to every file upload action
              */
             lastFileId: 0,
@@ -105,14 +110,6 @@
                     b.refreshVars(path);
                     b.refreshView(path);
                 });
-            },
-
-            rename: function() {
-
-            },
-
-            delete: function() {
-
             },
 
             /**
@@ -521,6 +518,8 @@
              * @param {object} self $(this) in fact
              */
             renameEvent: function(e, self) {
+                b.currentOperation = 'rename';
+
                 $('#begard-operations-links').addClass('disabled');
                 $('#begard-operation-rename').removeClass('disabled');
 
@@ -555,7 +554,7 @@
                     cache: false
                 }).done(function(data) {
                     if (data.status !== 1) {
-                        b.showError(data.error);
+                        b.showError(data.message);
                     } else {
                         b.needRefresh(data.path);
                     }
@@ -564,6 +563,8 @@
                 }).complete(function() {
                     $('#begard-operations-links').removeClass('disabled');
                     $('#begard-operation-rename').addClass('disabled');
+
+                    b.currentOperation = null;
                 });
             },
 
@@ -575,6 +576,8 @@
             renameCancelEvent: function(e, self) {
                 $('#begard-operations-links').removeClass('disabled');
                 $('#begard-operation-rename').addClass('disabled');
+
+                b.currentOperation = null;
             },
 
             /**
@@ -583,13 +586,15 @@
              * @param {object} self $(this) in fact
              */
             deleteEvent: function(e, self) {
+                b.currentOperation = 'delete';
+
                 $('#begard-operations-links').addClass('disabled');
                 $('#begard-operation-delete').removeClass('disabled');
 
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'delete', 'path': b.currentPath, files: [], directories: []};
+                b.willOperate = {requestType: 'operation', operation: 'delete', path: b.currentPath, files: [], directories: []};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
@@ -615,7 +620,7 @@
                     cache: false
                 }).done(function(data) {
                     if (data.status !== 1) {
-                        b.showError(data.error);
+                        b.showError(data.message);
                     } else {
                         b.needRefresh(data.path);
                     }
@@ -624,6 +629,8 @@
                 }).complete(function() {
                     $('#begard-operations-links').removeClass('disabled');
                     $('#begard-operation-delete').addClass('disabled');
+
+                    b.currentOperation = null;
                 });
             },
 
@@ -635,6 +642,8 @@
             deleteCancelEvent: function(e, self) {
                 $('#begard-operations-links').removeClass('disabled');
                 $('#begard-operation-delete').addClass('disabled');
+
+                b.currentOperation = null;
             },
 
             /**

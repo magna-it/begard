@@ -71,9 +71,14 @@
                 $(document).on('click',    '#begard-error-close',  function(e) { b.closeErrorEvent(e, $(this)); });
 
                 //Rename
-                $(document).on('click',   '#begard-operation-rename-link', function(e) { b.renameEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-rename-link',   function(e) { b.renameEvent(e, $(this)); });
                 $(document).on('click',   '#begard-operation-rename-cancel', function(e) { b.renameCancelEvent(e, $(this)); });
-                $(document).on('click',   '#begard-operation-rename-go', function(e) { b.renameGoEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-rename-go',     function(e) { b.renameGoEvent(e, $(this)); });
+
+                //Delete
+                $(document).on('click',   '#begard-operation-delete-link',   function(e) { b.deleteEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-delete-cancel', function(e) { b.deleteCancelEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-delete-go',     function(e) { b.deleteGoEvent(e, $(this)); });
 
             },
 
@@ -185,6 +190,7 @@
                     $('#begard-operations-links').removeClass('disabled');
 
                     $('#begard-operation-rename').addClass('disabled');
+                    $('#begard-operation-delete').addClass('disabled');
 
                     //Toggle rename button
                     if ((filesSelected.length === 1 && directoriesSelected.length === 0) ||
@@ -245,6 +251,7 @@
                 $('#begard-operation-delete-link').addClass('disabled');
 
                 $('#begard-operation-rename').addClass('disabled');
+                $('#begard-operation-delete').addClass('disabled');
             },
 
             /**
@@ -568,6 +575,66 @@
             renameCancelEvent: function(e, self) {
                 $('#begard-operations-links').removeClass('disabled');
                 $('#begard-operation-rename').addClass('disabled');
+            },
+
+            /**
+             * Delete event
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            deleteEvent: function(e, self) {
+                $('#begard-operations-links').addClass('disabled');
+                $('#begard-operation-delete').removeClass('disabled');
+
+                var filesSelected = $('#begard-files .begard-selected');
+                var directoriesSelected = $('#begard-directories .begard-selected');
+
+                b.willOperate = {requestType: 'operation', operation: 'delete', 'path': b.currentPath, files: [], directories: []};
+
+                filesSelected.each(function() {
+                    var path = $(this).attr('data-path');
+                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                });
+
+                directoriesSelected.each(function() {
+                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                });
+            },
+
+            /**
+             * Delete files or directories
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            deleteGoEvent: function(e, self) {
+                $.ajax({
+                    url: b.options.remote,
+                    data: b.willOperate,
+                    method: b.options.method,
+                    dataType: "json",
+                    cache: false
+                }).done(function(data) {
+                    if (data.status !== 1) {
+                        b.showError(data.error);
+                    } else {
+                        b.needRefresh(data.path);
+                    }
+                }).fail(function() {
+                    b.showError(b.options.defaultErrorMessage);
+                }).complete(function() {
+                    $('#begard-operations-links').removeClass('disabled');
+                    $('#begard-operation-delete').addClass('disabled');
+                });
+            },
+
+            /**
+             * Cancel delete
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            deleteCancelEvent: function(e, self) {
+                $('#begard-operations-links').removeClass('disabled');
+                $('#begard-operation-delete').addClass('disabled');
             },
 
             /**

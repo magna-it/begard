@@ -30,6 +30,10 @@
 #begard-operations-links {
     margin: 5px 0;
 }
+#begard-operation-delete {
+    padding: 5px;
+    border-radius: 4px;
+}
 .begard-upload-error {
     color: red;
 }

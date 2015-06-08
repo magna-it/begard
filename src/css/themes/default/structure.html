@@ -20,6 +20,10 @@
         </div>
         <div id="begard-details" class="col-md-3">
             <div class="begard-inner">
+                <div id="begard-error" class="bg-danger">
+                    <a id="begard-error-close"><i class="fa fa-times"></i></a>
+                    <p id="begard-error-text"></p>
+                </div>
                 <div id="begard-upload">
                     <h4>Upload</h4>
                     <div class="text-center">
@@ -35,12 +39,21 @@
                 </div>
                 <div id="begard-operations">
                     <h4>Operations</h4>
-                    <div class="text-center">
-                        <a id="begard-operation-rename" href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
-                        <a id="begard-operation-copy" href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
-                        <a id="begard-operation-move" href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
-                        <a id="begard-operation-delete" href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
-                        <a id="begard-operation-paste" href="javascript:void(0)" class="btn btn-default" title="Paste"><i class="fa fa-paste"></i></a>
+                    <div id="begard-operations-links" class="text-center">
+                        <a id="begard-operation-rename-link" href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
+                        <a id="begard-operation-copy-link" href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
+                        <a id="begard-operation-move-link" href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
+                        <a id="begard-operation-delete-link" href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
+                        <a id="begard-operation-paste-link" href="javascript:void(0)" class="btn btn-default" title="Paste"><i class="fa fa-paste"></i></a>
+                    </div>
+                    <div id="begard-operation-rename">
+                        <div class="input-group">
+                            <input id="begard-operation-rename-input" type="text" class="form-control" placeholder="Rename to">
+                            <span class="input-group-btn">
+                                <button id="begard-operation-rename-cancel" class="btn btn-default" type="button">Cancel</button>
+                                <button id="begard-operation-rename-go" class="btn btn-default" type="button">Rename</button>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div id="begard-file-details"></div>

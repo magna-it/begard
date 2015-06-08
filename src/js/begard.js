@@ -15,6 +15,7 @@
                 remote: '',
                 method: 'POST',
                 multiSelect: false,
+                defaultErrorMessage: 'An error occurred',
                 templates: {
                     directory: '<div class="begard-directory" data-path="{data-path}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
                     file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li></ul></div>',
@@ -52,6 +53,7 @@
                 b.openFolder('/');
 
                 b.disableOperations();
+                $('#begard-error').addClass('disabled');
             },
 
             /**
@@ -66,6 +68,13 @@
                 $(document).on('click',    '#begard-up',           function(e) { b.upDirectoryEvent(e, $(this)); });
                 $(document).on('click',    '.begard-upload-close', function(e) { b.uploadCloseEvent(e, $(this)); });
                 $(document).on('change',   '#begard-upload-input', function(e) { b.uploadInputChangeEvent(e, $(this)); });
+                $(document).on('click',    '#begard-error-close',  function(e) { b.closeErrorEvent(e, $(this)); });
+
+                //Rename
+                $(document).on('click',   '#begard-operation-rename-link', function(e) { b.renameEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-rename-cancel', function(e) { b.renameCancelEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-rename-go', function(e) { b.renameGoEvent(e, $(this)); });
+
             },
 
             /**
@@ -80,7 +89,8 @@
                         requestType: 'info'
                     },
                     method: b.options.method,
-                    dataType: "json"
+                    dataType: "json",
+                    cache: false
                 }).done(function(data) {
                     var path = data.path;
                     delete data.path;
@@ -172,21 +182,24 @@
                     $('#begard-operations').addClass('disabled');
                 } else {
                     $('#begard-operations').removeClass('disabled');
+                    $('#begard-operations-links').removeClass('disabled');
+
+                    $('#begard-operation-rename').addClass('disabled');
 
                     //Toggle rename button
                     if ((filesSelected.length === 1 && directoriesSelected.length === 0) ||
                         (filesSelected.length === 0 && directoriesSelected.length === 1)) {
-                        $('#begard-operation-rename').removeClass('disabled');
+                        $('#begard-operation-rename-link').removeClass('disabled');
                     } else {
-                        $('#begard-operation-rename').addClass('disabled');
+                        $('#begard-operation-rename-link').addClass('disabled');
                     }
 
                     //Toggle copy, move, delete and cut buttons
                     if (filesSelected.length > 0 || directoriesSelected.length > 0) {
-                        $('#begard-operation-copy').removeClass('disabled');
-                        $('#begard-operation-move').removeClass('disabled');
-                        $('#begard-operation-delete').removeClass('disabled');
-                        $('#begard-operation-cut').removeClass('disabled');
+                        $('#begard-operation-copy-link').removeClass('disabled');
+                        $('#begard-operation-move-link').removeClass('disabled');
+                        $('#begard-operation-delete-link').removeClass('disabled');
+                        $('#begard-operation-cut-link').removeClass('disabled');
 
                     }
                 }
@@ -225,11 +238,13 @@
              */
             disableOperations: function() {
                 $('#begard-operations').addClass('disabled');
-                $('#begard-operation-paste').addClass('disabled');
-                $('#begard-operation-copy').addClass('disabled');
+                $('#begard-operation-paste-link').addClass('disabled');
+                $('#begard-operation-copy-link').addClass('disabled');
+                $('#begard-operation-rename-link').addClass('disabled');
+                $('#begard-operation-move-link').addClass('disabled');
+                $('#begard-operation-delete-link').addClass('disabled');
+
                 $('#begard-operation-rename').addClass('disabled');
-                $('#begard-operation-move').addClass('disabled');
-                $('#begard-operation-delete').addClass('disabled');
             },
 
             /**
@@ -416,6 +431,7 @@
                     dataType: 'json',
                     processData: false,
                     contentType: false,
+                    cache: false,
                     xhr: function() {
                         var xhr = $.ajaxSettings.xhr();
                         if (xhr.upload) {
@@ -439,10 +455,7 @@
                         var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
                         uploadItem.addClass('begard-upload-item-succeed');
 
-                        delete b.data[data.path];
-                        if (data.path === b.currentPath) {
-                            $('#begard-need-refresh').attr('data-path', b.currentPath).removeClass('disabled');
-                        }
+                        b.needRefresh(data.path);
                     }
                 }).fail(function(xhr, text) {
                     b.failedUploadItem(file);
@@ -493,6 +506,97 @@
              */
             uploadCloseEvent: function(e, self) {
                 self.closest('.begard-upload-item').remove();
+            },
+
+            /**
+             * Rename event
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            renameEvent: function(e, self) {
+                $('#begard-operations-links').addClass('disabled');
+                $('#begard-operation-rename').removeClass('disabled');
+
+                var fileSelected = $('#begard-files .begard-selected');
+                var directorySelected = $('#begard-directories .begard-selected');
+
+                b.willOperate = {requestType: 'operation', operation: 'rename'};
+
+                if (fileSelected.length === 1) {
+                    var path = fileSelected.attr('data-path');
+                    b.willOperate.type = 'file';
+                    b.willOperate.path = path;
+                    b.willOperate.name = b.data[path]['files'][fileSelected.attr('data-index')].name;
+                } else {
+                    b.willOperate.type = 'directory';
+                    b.willOperate.path = directorySelected.attr('data-path');
+                }
+            },
+
+            /**
+             * Rename a file or directory
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            renameGoEvent: function(e, self) {
+                b.willOperate.renameTo = $('#begard-operation-rename-input').val();
+                $.ajax({
+                    url: b.options.remote,
+                    data: b.willOperate,
+                    method: b.options.method,
+                    dataType: "json",
+                    cache: false
+                }).done(function(data) {
+                    if (data.status !== 1) {
+                        b.showError(data.error);
+                    } else {
+                        b.needRefresh(data.path);
+                    }
+                }).fail(function() {
+                    b.showError(b.options.defaultErrorMessage);
+                }).complete(function() {
+                    $('#begard-operations-links').removeClass('disabled');
+                    $('#begard-operation-rename').addClass('disabled');
+                });
+            },
+
+            /**
+             * Cancel for rename
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            renameCancelEvent: function(e, self) {
+                $('#begard-operations-links').removeClass('disabled');
+                $('#begard-operation-rename').addClass('disabled');
+            },
+
+            /**
+             * Current path need to refresh
+             * @param {string} path
+             */
+            needRefresh: function(path) {
+                delete b.data[path];
+                if (path === b.currentPath) {
+                    $('#begard-need-refresh').attr('data-path', b.currentPath).removeClass('disabled');
+                }
+            },
+
+            /**
+             * Show a error
+             * @param {string} message
+             */
+            showError: function(message) {
+                $('#begard-error').removeClass('disabled');
+                $('#begard-error-text').text(message);
+            },
+
+            /**
+             * Close error message
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            closeErrorEvent: function(e, self) {
+                $('#begard-error').addClass('disabled');
             }
         };
 

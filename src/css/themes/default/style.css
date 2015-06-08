@@ -27,6 +27,9 @@
     background: #fff;
     padding: 5px;
 }
+#begard-operations-links {
+    margin: 5px 0;
+}
 .begard-upload-error {
     color: red;
 }
@@ -87,6 +90,16 @@
 
 #begard-up.disabled {
     display: none;
+}
+#begard-error {
+    padding: 5px 5px 5px 20px;
+    border-radius: 4px;
+    position: relative;
+}
+#begard-error-close {
+    position: absolute;
+    top: 5px;
+    left: 5px;
 }
 .begard-selected {
     background: #E0E0E0;

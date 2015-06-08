@@ -85,6 +85,11 @@
                 $(document).on('click',   '#begard-operation-delete-cancel', function(e) { b.deleteCancelEvent(e, $(this)); });
                 $(document).on('click',   '#begard-operation-delete-go',     function(e) { b.deleteGoEvent(e, $(this)); });
 
+                //Copy, move and paste
+                $(document).on('click',   '#begard-operation-copy-link',     function(e) { b.copyEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-paste-cancel',  function(e) { b.pasteCancelEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-paste-go',      function(e) { b.pasteGoEvent(e, $(this)); });
+
             },
 
             /**
@@ -129,9 +134,14 @@
                 b.refreshFiles(path);
                 b.checkUpDirectory(path);
                 b.refreshBreadcrumb();
-                b.disableOperations();
+
+                if (b.currentOperation === null)
+                    b.disableOperations();
+                else
+                    b.updateOperations();
 
                 $('#begard-need-refresh').addClass('disabled');
+                $('#begard-file-details').addClass('disabled');
             },
 
             /**
@@ -174,37 +184,52 @@
             },
 
             /**
-             * Toggle operations button
+             * Toggle operations button when select or deselect file or directory
              */
             refreshOperations: function() {
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                if (filesSelected.length === 0 && directoriesSelected.length === 0) {
-                    $('#begard-operations').addClass('disabled');
-                } else {
-                    $('#begard-operations').removeClass('disabled');
-                    $('#begard-operations-links').removeClass('disabled');
-
-                    $('#begard-operation-rename').addClass('disabled');
-                    $('#begard-operation-delete').addClass('disabled');
-
-                    //Toggle rename button
-                    if ((filesSelected.length === 1 && directoriesSelected.length === 0) ||
-                        (filesSelected.length === 0 && directoriesSelected.length === 1)) {
-                        $('#begard-operation-rename-link').removeClass('disabled');
+                if (b.currentOperation === null) {
+                    if (filesSelected.length === 0 && directoriesSelected.length === 0) {
+                        $('#begard-operations').addClass('disabled');
                     } else {
-                        $('#begard-operation-rename-link').addClass('disabled');
-                    }
+                        $('#begard-operations').removeClass('disabled');
+                        $('#begard-operations-links').removeClass('disabled');
 
-                    //Toggle copy, move, delete and cut buttons
-                    if (filesSelected.length > 0 || directoriesSelected.length > 0) {
-                        $('#begard-operation-copy-link').removeClass('disabled');
-                        $('#begard-operation-move-link').removeClass('disabled');
-                        $('#begard-operation-delete-link').removeClass('disabled');
-                        $('#begard-operation-cut-link').removeClass('disabled');
+                        $('#begard-operation-rename').addClass('disabled');
+                        $('#begard-operation-delete').addClass('disabled');
 
+                        //Toggle rename button
+                        if ((filesSelected.length === 1 && directoriesSelected.length === 0) ||
+                            (filesSelected.length === 0 && directoriesSelected.length === 1)) {
+                            $('#begard-operation-rename-link').removeClass('disabled');
+                        } else {
+                            $('#begard-operation-rename-link').addClass('disabled');
+                        }
+
+                        //Toggle copy, move, delete and cut buttons
+                        if (filesSelected.length > 0 || directoriesSelected.length > 0) {
+                            $('#begard-operation-copy-link').removeClass('disabled');
+                            $('#begard-operation-move-link').removeClass('disabled');
+                            $('#begard-operation-delete-link').removeClass('disabled');
+                            $('#begard-operation-cut-link').removeClass('disabled');
+
+                        }
                     }
+                }
+            },
+
+            /**
+             * Update operations button when view is refreshed
+             */
+            updateOperations: function() {
+                if (b.currentOperation === 'copy' || b.currentOperation === 'move') {
+                    //Enable paste button if copy or move path against to currentPath
+                    if (b.willOperate.path !== b.currentPath)
+                        $('#begard-operation-paste-go').removeClass('disabled').removeAttr('disabled');
+                    else
+                        $('#begard-operation-paste-go').addClass('disabled').addAttr('disabled');
                 }
             },
 
@@ -241,7 +266,6 @@
              */
             disableOperations: function() {
                 $('#begard-operations').addClass('disabled');
-                $('#begard-operation-paste-link').addClass('disabled');
                 $('#begard-operation-copy-link').addClass('disabled');
                 $('#begard-operation-rename-link').addClass('disabled');
                 $('#begard-operation-move-link').addClass('disabled');
@@ -249,6 +273,7 @@
 
                 $('#begard-operation-rename').addClass('disabled');
                 $('#begard-operation-delete').addClass('disabled');
+                $('#begard-operation-paste').addClass('disabled');
             },
 
             /**
@@ -644,6 +669,79 @@
                 $('#begard-operation-delete').addClass('disabled');
 
                 b.currentOperation = null;
+            },
+
+            /**
+             * Copy event
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            copyEvent: function(e, self) {
+                b.currentOperation = 'copy';
+
+                $('#begard-operations-links').addClass('disabled');
+                $('#begard-operation-paste').removeClass('disabled');
+                $('#begard-operation-paste-go').addClass('disabled').attr('disabled');
+
+                var filesSelected = $('#begard-files .begard-selected');
+                var directoriesSelected = $('#begard-directories .begard-selected');
+
+                b.willOperate = {requestType: 'operation', operation: 'copy', path: b.currentPath, files: [], directories: []};
+
+                filesSelected.each(function() {
+                    var path = $(this).attr('data-path');
+                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                });
+
+                directoriesSelected.each(function() {
+                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                });
+            },
+
+            /**
+             * Cancel paste copy or moved files and directories
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            pasteCancelEvent: function(e, self) {
+                $('#begard-operations-links').removeClass('disabled');
+                $('#begard-operation-paste').addClass('disabled');
+                $('#begard-operation-paste-go').removeClass('disabled').removeAttr('disabled');
+
+                b.currentOperation = null;
+            },
+
+            /**
+             * Paste
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            pasteGoEvent: function(e, self) {
+                b.willOperate.pathTo = b.currentPath;
+
+                $.ajax({
+                    url: b.options.remote,
+                    data: b.willOperate,
+                    method: b.options.method,
+                    dataType: "json",
+                    cache: false
+                }).done(function(data) {
+                    if (data.status !== 1) {
+                        b.showError(data.message);
+                    } else {
+                        if (data.path === b.currentPath)
+                            b.needRefresh(data.path);
+                        else if (data.pathTo === b.currentPath)
+                            b.needRefresh(data.pathTo);
+                    }
+                }).fail(function() {
+                    b.showError(b.options.defaultErrorMessage);
+                }).complete(function() {
+                    $('#begard-operations-links').removeClass('disabled');
+                    $('#begard-operation-paste').addClass('disabled');
+
+                    b.currentOperation = null;
+                });
             },
 
             /**

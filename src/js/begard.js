@@ -87,6 +87,7 @@
 
                 //Copy, move and paste
                 $(document).on('click',   '#begard-operation-copy-link',     function(e) { b.copyEvent(e, $(this)); });
+                $(document).on('click',   '#begard-operation-move-link',     function(e) { b.moveEvent(e, $(this)); });
                 $(document).on('click',   '#begard-operation-paste-cancel',  function(e) { b.pasteCancelEvent(e, $(this)); });
                 $(document).on('click',   '#begard-operation-paste-go',      function(e) { b.pasteGoEvent(e, $(this)); });
 
@@ -698,6 +699,28 @@
                 });
             },
 
+            moveEvent: function(e, self) {
+                b.currentOperation = 'move';
+
+                $('#begard-operations-links').addClass('disabled');
+                $('#begard-operation-paste').removeClass('disabled');
+                $('#begard-operation-paste-go').addClass('disabled').attr('disabled');
+
+                var filesSelected = $('#begard-files .begard-selected');
+                var directoriesSelected = $('#begard-directories .begard-selected');
+
+                b.willOperate = {requestType: 'operation', operation: 'move', path: b.currentPath, files: [], directories: []};
+
+                filesSelected.each(function() {
+                    var path = $(this).attr('data-path');
+                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                });
+
+                directoriesSelected.each(function() {
+                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                });
+            },
+
             /**
              * Cancel paste copy or moved files and directories
              * @param {object} e
@@ -718,7 +741,8 @@
              */
             pasteGoEvent: function(e, self) {
                 b.willOperate.pathTo = b.currentPath;
-
+                console.log(b.willOperate);
+                return -1;
                 $.ajax({
                     url: b.options.remote,
                     data: b.willOperate,

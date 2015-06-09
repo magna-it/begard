@@ -94,7 +94,21 @@
             },
 
             /**
-             * Get data for specific path and refresh view
+             * Get info of specific path and refresh view
+             * Example request of info:
+             *  {
+             *      requestType: 'info',
+             *      path: '/'
+             *  }
+             *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      path: '/',
+             *      files: [{name: 'file 1.txt', extension: 'txt', size: 15409}],
+             *      directories: ['directory 1', 'directory 2']
+             *  }
+             *
              * @param {string} path
              */
             getData: function(path) {
@@ -120,6 +134,7 @@
 
             /**
              * Refresh variables
+             *
              * @param {string} path
              */
             refreshVars: function(path) {
@@ -128,6 +143,7 @@
 
             /**
              * Refresh view
+             *
              * @param {string} path
              */
             refreshView: function(path) {
@@ -147,6 +163,7 @@
 
             /**
              * Run when select a directory
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -156,6 +173,7 @@
 
             /**
              * Run when select a file
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -165,6 +183,7 @@
 
             /**
              * Select a directory or file
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              * @param {string} type [file|directory]
@@ -279,6 +298,7 @@
 
             /**
              * Open a folder by given path
+             *
              * @param {string} path
              */
             openDirectory: function(path) {
@@ -293,6 +313,7 @@
 
             /**
              * Open a folder when user click on a directory
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -305,6 +326,7 @@
 
             /**
              * Open a folder when user click on a breadcrumb
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -316,6 +338,7 @@
 
             /**
              * Create directory path
+             *
              * @param {string} path
              * @param {int} index
              */
@@ -331,6 +354,7 @@
 
             /**
              * Enable need refresh button
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -343,6 +367,7 @@
 
             /**
              * Open a folder and refresh view
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -370,6 +395,7 @@
 
             /**
              * Define status of up button
+             *
              * @param {string} path
              */
             checkUpDirectory: function(path) {
@@ -382,6 +408,7 @@
 
             /**
              * Refresh file list by given path
+             *
              * @param {string} path
              */
             refreshFiles: function(path) {
@@ -401,6 +428,7 @@
 
             /**
              * Refresh directory list by given path
+             *
              * @param {string} path
              */
             refreshDirectories: function(path) {
@@ -453,6 +481,7 @@
 
             /**
              * Select a file for upload
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -465,6 +494,20 @@
 
             /**
              * Upload file
+             * Example of upload request:
+             *  {
+             *      requestType: 'upload',
+             *      path: '/',
+             *      file: FILE,
+             *  }
+             *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      fileName: 'file 1',
+             *      path: '/',
+             *  }
+             *
              * @param {object} file File, file.percent and file.id also need.
              */
             upload: function(file) {
@@ -576,6 +619,12 @@
              *
              * Type can be directory or file
              *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      path: '/',
+             *  }
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -605,6 +654,7 @@
 
             /**
              * Rename a file or directory
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -634,6 +684,7 @@
 
             /**
              * Cancel for rename
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -656,6 +707,12 @@
              *  }
              *
              * file or directories maybe not send
+             *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      path: '/',
+             *  }
              *
              * @param {object} e
              * @param {object} self $(this) in fact
@@ -684,6 +741,7 @@
 
             /**
              * Delete files or directories
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -712,6 +770,7 @@
 
             /**
              * Cancel delete
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -735,6 +794,13 @@
              *  }
              *
              * file or directories maybe not send
+             *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      path: '/',
+             *      pathTo: '/another path',
+             *  }
              *
              * @param {object} e
              * @param {object} self $(this) in fact
@@ -776,6 +842,13 @@
              *
              * file or directories maybe not send
              *
+             * Example of response:
+             *  {
+             *      status: 1,
+             *      path: '/',
+             *      pathTo: '/another path',
+             *  }
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -804,6 +877,7 @@
 
             /**
              * Cancel paste copy or moved files and directories
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -817,6 +891,7 @@
 
             /**
              * Paste
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -832,9 +907,7 @@
                     if (data.status !== 1) {
                         b.showError(data.message);
                     } else {
-                        if (data.path === b.currentPath)
                             b.needRefresh(data.path);
-                        else if (data.pathTo === b.currentPath)
                             b.needRefresh(data.pathTo);
                     }
                 }).fail(function() {
@@ -849,6 +922,7 @@
 
             /**
              * Current path need to refresh
+             *
              * @param {string} path
              */
             needRefresh: function(path) {
@@ -860,6 +934,7 @@
 
             /**
              * Show a error
+             *
              * @param {string} message
              */
             showError: function(message) {
@@ -869,6 +944,7 @@
 
             /**
              * Close error message
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -881,6 +957,7 @@
 
             /**
              * Set configuration
+             *
              * @param {object} options
              */
             config: function(options) {

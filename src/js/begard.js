@@ -17,9 +17,9 @@
                 multiSelect: false,
                 defaultErrorMessage: 'An error occurred',
                 templates: {
-                    directory: '<div class="begard-directory" data-path="{data-path}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{folder-name}</li></ul></a></div>',
-                    file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {file-extension}-ext"></i></li><li>{file-name}</li></ul></div>',
-                    breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{directory-name}</a></li>',
+                    directory: '<div class="begard-directory" data-path="{data-path}" data-index="{data-index}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{data-name}</li></ul></a></div>',
+                    file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {data-extension}-ext"></i></li><li>{data-name}</li></ul></div>',
+                    breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{data-name}</a></li>',
                     fileDetails: '<h4>Selected file details</h4><ul><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>',
                     uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled">An error occurred.</li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
                 }
@@ -55,7 +55,7 @@
              */
             init: function() {
                 b.handleEvents();
-                b.openFolder('/');
+                b.openDirectory('/');
 
                 b.disableOperations();
                 $('#begard-error').addClass('disabled');
@@ -65,8 +65,8 @@
              * Handle events
              */
             handleEvents: function() {
-                $(document).on('dblclick', '.begard-directory',    function(e) { b.openFolderEvent(e, $(this)); });
-                $(document).on('click',    '.begard-crumb-to',     function(e) { b.openFolderEvent(e, $(this)); });
+                $(document).on('dblclick', '.begard-directory',    function(e) { b.openDirectoryEvent(e, $(this)); });
+                $(document).on('click',    '.begard-crumb-to',     function(e) { b.openCrumbDirectoryEvent(e, $(this)); });
                 $(document).on('click',    '#begard-need-refresh', function(e) { b.needRefreshEvent(e, $(this)); });
                 $(document).on('click',    '.begard-directory',    function(e) { b.selectDirectoryEvent(e, $(this)); });
                 $(document).on('click',    '.begard-file',         function(e) { b.selectFileEvent(e, $(this)); });
@@ -94,7 +94,7 @@
             },
 
             /**
-             * Get data for specific path
+             * Get data for specific path and refresh view
              * @param {string} path
              */
             getData: function(path) {
@@ -131,7 +131,7 @@
              * @param {string} path
              */
             refreshView: function(path) {
-                b.refreshFolders(path);
+                b.refreshDirectories(path);
                 b.refreshFiles(path);
                 b.checkUpDirectory(path);
                 b.refreshBreadcrumb();
@@ -281,7 +281,7 @@
              * Open a folder by given path
              * @param {string} path
              */
-            openFolder: function(path) {
+            openDirectory: function(path) {
                 //If data is already taken, Do not take again
                 if (typeof b.data[path] != "undefined") {
                     b.refreshVars(path);
@@ -292,14 +292,41 @@
             },
 
             /**
-             * Open a folder event when user click on a directory
+             * Open a folder when user click on a directory
              * @param {object} e
              * @param {object} self $(this) in fact
              */
-            openFolderEvent: function(e, self) {
+            openDirectoryEvent: function(e, self) {
+                var path = self.attr('data-path');
+                var index = self.attr('data-index');
+
+                b.openDirectory(b.createDirectoryPath(path, index));
+            },
+
+            /**
+             * Open a folder when user click on a breadcrumb
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            openCrumbDirectoryEvent: function(e, self) {
                 var path = self.attr('data-path');
 
-                b.openFolder(path);
+                b.openDirectory(path);
+            },
+
+            /**
+             * Create directory path
+             * @param {string} path
+             * @param {int} index
+             */
+            createDirectoryPath: function(path, index) {
+                var directoryName = b.data[path]['directories'][index];
+
+                //Do not add extra slash when path is root
+                if (path !== '/')   basePath = path + '/' + directoryName;
+                else                basePath = path + directoryName;
+
+                return basePath;
             },
 
             /**
@@ -311,7 +338,7 @@
                 var path = self.attr('data-path');
                 self.addClass('disabled');
 
-                b.openFolder(path);
+                b.openDirectory(path);
             },
 
             /**
@@ -329,7 +356,7 @@
                     //If upPath is empty so this is root
                     if (upPath === "") upPath = "/";
 
-                    b.openFolder(upPath);
+                    b.openDirectory(upPath);
                 }
             },
 
@@ -363,11 +390,11 @@
 
                     //Add file to html
                     var template = b.options.templates.file;
-                    template = template.replace(new RegExp('{file-name}', 'g'), file.name);
-                    template = template.replace(new RegExp('{file-size}', 'g'), file.size);
+                    template = template.replace(new RegExp('{data-name}', 'g'), file.name);
+                    template = template.replace(new RegExp('{data-size}', 'g'), file.size);
                     template = template.replace(new RegExp('{data-path}', 'g'), path);
                     template = template.replace(new RegExp('{data-index}', 'g'), index);
-                    template = template.replace(new RegExp('{file-extension}', 'g'), file.extension);
+                    template = template.replace(new RegExp('{data-extension}', 'g'), file.extension);
                     $('#begard-files').append(template);
                 });
             },
@@ -376,18 +403,15 @@
              * Refresh directory list by given path
              * @param {string} path
              */
-            refreshFolders: function(path) {
+            refreshDirectories: function(path) {
                 $('#begard-directories .begard-directory').remove();
                 $.each(b.data[path].directories, function(index, directoryName) {
 
-                    //Do not add extra slash when path is root
-                    if (path !== '/')   basePath = path + '/' + directoryName;
-                    else                basePath = path + directoryName;
-
                     //Add directory to html
                     var template = b.options.templates.directory;
-                    template = template.replace(new RegExp('{data-path}', 'g'), basePath);
-                    template = template.replace(new RegExp('{folder-name}', 'g'), directoryName);
+                    template = template.replace(new RegExp('{data-path}', 'g'), path);
+                    template = template.replace(new RegExp('{data-name}', 'g'), directoryName);
+                    template = template.replace(new RegExp('{data-index}', 'g'), index);
                     $('#begard-directories').append(template);
                 });
             },
@@ -408,7 +432,7 @@
 
                 //Add root breadcrumb
                 var template = b.options.templates.breadcrumb;
-                template = template.replace(new RegExp('{directory-name}', 'g'), '/');
+                template = template.replace(new RegExp('{data-name}', 'g'), '/');
                 template = template.replace(new RegExp('{data-path}', 'g'), path);
                 $('#begard-breadcrumb').append(template);
 
@@ -419,7 +443,7 @@
 
                     //Add breadcrumb to html
                     var template = b.options.templates.breadcrumb;
-                    template = template.replace(new RegExp('{directory-name}', 'g'), directoryName);
+                    template = template.replace(new RegExp('{data-name}', 'g'), directoryName);
                     template = template.replace(new RegExp('{data-path}', 'g'), path);
                     $('#begard-breadcrumb').append(template);
                     path += '/';
@@ -540,6 +564,18 @@
 
             /**
              * Rename event
+             * Example of rename request:
+             *  {
+             *      requestType: "operation"
+             *      operation: "rename",
+             *      type: "directory"
+             *      path: "/",
+             *      name: "Old name",
+             *      renameTo: "New name",
+             *  }
+             *
+             * Type can be directory or file
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -560,8 +596,10 @@
                     b.willOperate.path = path;
                     b.willOperate.name = b.data[path]['files'][fileSelected.attr('data-index')].name;
                 } else {
+                    var path = directorySelected.attr('data-path');
                     b.willOperate.type = 'directory';
-                    b.willOperate.path = directorySelected.attr('data-path');
+                    b.willOperate.path = path;
+                    b.willOperate.name = b.data[path]['directories'][directorySelected.attr('data-index')];
                 }
             },
 
@@ -608,6 +646,17 @@
 
             /**
              * Delete event
+             * Example of delete request:
+             *  {
+             *      requestType: "operation"
+             *      operation: "delete",
+             *      path: "/",
+             *      files: ['file 1', 'file 2'],
+             *      directories: ['directory 1', 'directory 2']
+             *  }
+             *
+             * file or directories maybe not send
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -624,11 +673,12 @@
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
-                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                    b.willOperate.files.push(b.data[path]['files'][$(this).attr('data-index')].name);
                 });
 
                 directoriesSelected.each(function() {
-                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                    var path = $(this).attr('data-path');
+                    b.willOperate.directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
                 });
             },
 
@@ -674,6 +724,18 @@
 
             /**
              * Copy event
+             * Example of copy request:
+             *  {
+             *      requestType: "operation"
+             *      operation: "copy",
+             *      path: "/",
+             *      pathTo: "/another path",
+             *      files: ['file 1', 'file 2'],
+             *      directories: ['directory 1', 'directory 2']
+             *  }
+             *
+             * file or directories maybe not send
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */
@@ -691,14 +753,32 @@
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
-                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                    b.willOperate.files.push(b.data[path]['files'][$(this).attr('data-index')].name);
                 });
 
                 directoriesSelected.each(function() {
-                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                    var path = $(this).attr('data-path');
+                    b.willOperate.directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
                 });
             },
 
+            /**
+             * Move event
+             * Example of move request:
+             *  {
+             *      requestType: "operation"
+             *      operation: "move",
+             *      path: "/",
+             *      pathTo: "/another path",
+             *      files: ['file 1', 'file 2'],
+             *      directories: ['directory 1', 'directory 2']
+             *  }
+             *
+             * file or directories maybe not send
+             *
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
             moveEvent: function(e, self) {
                 b.currentOperation = 'move';
 
@@ -713,11 +793,12 @@
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
-                    b.willOperate.files.push({path: path, name: b.data[path]['files'][$(this).attr('data-index')].name});
+                    b.willOperate.files.push(b.data[path]['files'][$(this).attr('data-index')].name);
                 });
 
                 directoriesSelected.each(function() {
-                    b.willOperate.directories.push({path: $(this).attr('data-path')});
+                    var path = $(this).attr('data-path');
+                    b.willOperate.directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
                 });
             },
 
@@ -741,8 +822,6 @@
              */
             pasteGoEvent: function(e, self) {
                 b.willOperate.pathTo = b.currentPath;
-                console.log(b.willOperate);
-                return -1;
                 $.ajax({
                     url: b.options.remote,
                     data: b.willOperate,

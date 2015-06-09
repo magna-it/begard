@@ -889,24 +889,24 @@
 
             /**
              * Start begard normally
-             * @param {string} template - Selector of underscore template
-             * @param {string} appendTo - Selector of element
              */
-            standalone: function(begardTemplate, appendTo) {
+            standalone: function() {
                 //Initialize
                 b.init();
 
                 $('#begard-close').addClass('disabled');
+                $('#begard').addClass('begard-standalone').removeClass('begard-modal');
 
             },
 
             /**
              * Start begard as a modal
-             * @param {string} template - Selector of underscore template
              */
-            modal: function(template) {
+            modal: function() {
                 //Initialize
                 b.init();
+
+                $('#begard').addClass('begard-modal').removeClass('begard-standalone');
             },
 
             /**

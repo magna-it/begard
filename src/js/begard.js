@@ -973,6 +973,7 @@
 
                 $('#begard-close').addClass('disabled');
                 $('#begard').addClass('begard-standalone').removeClass('begard-modal');
+                $('#begard-modal-back').addClass('disabled');
 
             },
 
@@ -984,6 +985,7 @@
                 b.init();
 
                 $('#begard').addClass('begard-modal').removeClass('begard-standalone');
+                $('#begard-modal-back').removeClass('disabled');
             },
 
             /**

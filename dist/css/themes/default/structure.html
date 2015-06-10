@@ -1,73 +1,75 @@
-<div id="begard" class="begard-standalone">
-    <div class="row">
-        <div id="begard-header" class="col-md-12">
-            <a id="begard-close" href="#" class="btn btn-warning">Close</a>
-            <h3 id="begard-header-h">Begard</h3>
+<div id="begard">
+    <div id="begard-header">
+        <a id="begard-close" href="#"><i class="fa fa-times fa-lg"></i></a>
+        <h3 id="begard-header-h">Begard</h3>
+    </div>
+    <div id="begard-addressbar">
+        <ul id="begard-breadcrumb" class="breadcrumb">
+            <a id="begard-up" href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-arrow-up"></i></a>
+        </ul>
+    </div>
+    <div id="begard-content">
+        <div class="begard-inner">
+            <a class="btn btn-xs btn-info" id="begard-need-refresh"><i class="fa fa-refresh"></i></a>
+            <div id="begard-files"></div>
+            <div class="clearfix"></div>
+            <div id="begard-directories"></div>
+            <div class="clearfix"></div>
         </div>
-        <div id="begard-addressbar" class="col-md-12">
-            <ul id="begard-breadcrumb" class="breadcrumb">
-                <a id="begard-up" href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-arrow-up"></i></a>
-            </ul>
-        </div>
-        <div id="begard-content" class="col-md-9">
-            <div class="begard-inner">
-                <a class="btn btn-xs btn-info" id="begard-need-refresh"><i class="fa fa-refresh"></i></a>
-                <div id="begard-files"></div>
-                <div class="clearfix"></div>
-                <div id="begard-directories"></div>
-                <div class="clearfix"></div>
+    </div>
+    <div id="begard-details">
+        <div class="begard-inner">
+            <div id="begard-error" class="bg-danger">
+                <a id="begard-error-close"><i class="fa fa-times"></i></a>
+                <p id="begard-error-text"></p>
             </div>
-        </div>
-        <div id="begard-details" class="col-md-3">
-            <div class="begard-inner">
-                <div id="begard-error" class="bg-danger">
-                    <a id="begard-error-close"><i class="fa fa-times"></i></a>
-                    <p id="begard-error-text"></p>
+            <div id="begard-upload">
+                <h4>Upload</h4>
+                <div class="text-center">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fa fa-upload"></i>
+                        Select file...
+                        <form id="begard-upload-form">
+                            <input id="begard-upload-input" type="file" name="file">
+                        </form>
+                    </a>
                 </div>
-                <div id="begard-upload">
-                    <h4>Upload</h4>
+                <div id="begard-upload-list"></div>
+            </div>
+            <div id="begard-operations">
+                <h4>Operations</h4>
+                <div id="begard-operations-links" class="text-center">
+                    <a id="begard-operation-rename-link" href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
+                    <a id="begard-operation-copy-link" href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
+                    <a id="begard-operation-move-link" href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
+                    <a id="begard-operation-delete-link" href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
+                </div>
+                <div id="begard-operation-rename">
+                    <div class="input-group">
+                        <input id="begard-operation-rename-input" type="text" class="form-control" placeholder="Rename to">
+                        <span class="input-group-btn">
+                            <button id="begard-operation-rename-cancel" class="btn btn-default" type="button">Cancel</button>
+                            <button id="begard-operation-rename-go" class="btn btn-default" type="button">Rename</button>
+                        </span>
+                    </div>
+                </div>
+                <div id="begard-operation-delete" class="bg-danger">
+                    <p>Are you sure for delete?</p>
                     <div class="text-center">
-                        <a href="#" class="btn btn-primary">
-                            <i class="fa fa-upload"></i>
-                            Select file...
-                            <form id="begard-upload-form">
-                                <input id="begard-upload-input" type="file" name="file">
-                            </form>
-                        </a>
-                    </div>
-                    <div id="begard-upload-list"></div>
-                </div>
-                <div id="begard-operations">
-                    <h4>Operations</h4>
-                    <div id="begard-operations-links" class="text-center">
-                        <a id="begard-operation-rename-link" href="javascript:void(0)" class="btn btn-info" title="Rename"><i class="fa fa-edit"></i></a>
-                        <a id="begard-operation-copy-link" href="javascript:void(0)" class="btn btn-primary" title="Copy"><i class="fa fa-copy"></i></a>
-                        <a id="begard-operation-move-link" href="javascript:void(0)" class="btn btn-warning" title="Move"><i class="fa fa-cut"></i></a>
-                        <a id="begard-operation-delete-link" href="javascript:void(0)" class="btn btn-danger" title="Delete"><i class="fa fa-unlink"></i></a>
-                    </div>
-                    <div id="begard-operation-rename">
-                        <div class="input-group">
-                            <input id="begard-operation-rename-input" type="text" class="form-control" placeholder="Rename to">
-                            <span class="input-group-btn">
-                                <button id="begard-operation-rename-cancel" class="btn btn-default" type="button">Cancel</button>
-                                <button id="begard-operation-rename-go" class="btn btn-default" type="button">Rename</button>
-                            </span>
-                        </div>
-                    </div>
-                    <div id="begard-operation-delete" class="bg-danger">
-                        <p>Are you sure for delete?</p>
-                        <div class="text-center">
-                            <button id="begard-operation-delete-cancel" class="btn btn-default" type="button">No</button>
-                            <button id="begard-operation-delete-go" class="btn btn-danger" type="button">Yes</button>
-                        </div>
-                    </div>
-                    <div id="begard-operation-paste" class="text-center">
-                        <a id="begard-operation-paste-go" href="javascript:void(0)" class="btn btn-info" title="Paste"><i class="fa fa-paste"></i></a>
-                        <a id="begard-operation-paste-cancel" href="javascript:void(0)" class="btn btn-danger" title="Cancel"><i class="fa fa-times"></i></a>
+                        <button id="begard-operation-delete-cancel" class="btn btn-default" type="button">No</button>
+                        <button id="begard-operation-delete-go" class="btn btn-danger" type="button">Yes</button>
                     </div>
                 </div>
-                <div id="begard-file-details"></div>
+                <div id="begard-operation-paste" class="text-center">
+                    <a id="begard-operation-paste-go" href="javascript:void(0)" class="btn btn-info" title="Paste"><i class="fa fa-paste"></i></a>
+                    <a id="begard-operation-paste-cancel" href="javascript:void(0)" class="btn btn-danger" title="Cancel"><i class="fa fa-times"></i></a>
+                </div>
+            </div>
+            <div id="begard-file-details"></div>
+            <div id="begard-select" class="text-center">
+                <a href="#" id="begard-select-link" class="btn btn-info"><i class="fa fa-check-circle-o"></i> Select</a>
             </div>
         </div>
     </div>
 </div>
+<div id="begard-modal-back" class="disabled"></div>

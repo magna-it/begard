@@ -26,6 +26,22 @@
             },
 
             /**
+             * Options for modal view
+             */
+            modalOptions: {
+                select: true,
+                fileSelect: true,
+                directorySelect: false
+            },
+
+            /**
+             * Event for modal view
+             */
+            modalEvents: {
+                afterSelect: null
+            },
+
+            /**
              * All data about files and folders
              */
             data: [],
@@ -51,9 +67,16 @@
             willOperate: [],
 
             /**
+             * Is Begard started in modal view
+             */
+            isModal: false,
+
+            /**
              * Initialize begard
              */
-            init: function() {
+            init: function(isModal) {
+                b.isModal = isModal;
+
                 b.handleEvents();
                 b.openDirectory('/');
 
@@ -74,6 +97,10 @@
                 $(document).on('click',    '.begard-upload-close', function(e) { b.uploadCloseEvent(e, $(this)); });
                 $(document).on('change',   '#begard-upload-input', function(e) { b.uploadInputChangeEvent(e, $(this)); });
                 $(document).on('click',    '#begard-error-close',  function(e) { b.closeErrorEvent(e, $(this)); });
+
+                //Modal view
+                $(document).on('click',    '#begard-close',       function(e) { b.closeBegard(); });
+                $(document).on('click',    '#begard-select-link', function(e) { b.selectEvent(e, $(this)); });
 
                 //Rename
                 $(document).on('click',   '#begard-operation-rename-link',   function(e) { b.renameEvent(e, $(this)); });
@@ -199,8 +226,40 @@
                         self.addClass('begard-selected');
                     }
                 }
+
                 b.refreshFileDetails();
                 b.refreshOperations();
+                b.refreshModalView()
+            },
+
+            /**
+             * Refresh elements that belongs to modal view
+             */
+            refreshModalView: function() {
+                var filesSelected = $('#begard-files .begard-selected');
+                var directoriesSelected = $('#begard-directories .begard-selected');
+
+                if (b.isModal && b.modalOptions.select) {
+
+                    //First enable select link if any file or directory selected
+                    if (filesSelected.length > 0 || directoriesSelected.length > 0) {
+                        $('#begard-select-link').removeClass('disabled').removeAttr('disabled');
+                    } else {
+                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                    }
+
+                    // Then if file select is denied and user selected a file
+                    // disable select link
+                    if (filesSelected.length > 0 && !b.modalOptions.fileSelect) {
+                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                    }
+
+                    // and if directory select is denied and user selected a directory
+                    // disable select link
+                    if (directoriesSelected.length > 0 && !b.modalOptions.directorySelect) {
+                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                    }
+                }
             },
 
             /**
@@ -950,6 +1009,41 @@
              */
             closeErrorEvent: function(e, self) {
                 $('#begard-error').addClass('disabled');
+            },
+
+            /**
+             * Clsoe begard file manager when started as a modal
+             */
+            closeBegard: function() {
+                $('#begard').removeClass('begard-modal');
+                $('#begard-modal-back').addClass('disabled');
+            },
+
+            /**
+             * Select link event
+             *
+             * @param {object} e
+             * @param {object} self $(this) in fact
+             */
+            selectEvent: function(e, self) {
+                if (b.modalEvents.afterSelect !== null) {
+                    var filesSelected = $('#begard-files .begard-selected');
+                    var directoriesSelected = $('#begard-directories .begard-selected');
+
+                    var selected = {path: b.currentPath, files: [], directories: []};
+
+                    filesSelected.each(function() {
+                        var path = $(this).attr('data-path');
+                        selected.files.push(b.data[path]['files'][$(this).attr('data-index')].name);
+                    });
+
+                    directoriesSelected.each(function() {
+                        var path = $(this).attr('data-path');
+                        selected.directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
+                    });
+                    b.modalEvents.afterSelect(selected);
+                }
+                b.closeBegard();
             }
         };
 
@@ -969,23 +1063,32 @@
              */
             standalone: function() {
                 //Initialize
-                b.init();
+                b.init(false);
 
                 $('#begard-close').addClass('disabled');
                 $('#begard').addClass('begard-standalone').removeClass('begard-modal');
                 $('#begard-modal-back').addClass('disabled');
-
+                $('#begard-select').addClass('disabled');
             },
 
             /**
              * Start begard as a modal
              */
-            modal: function() {
+            modal: function(options, events) {
+                $.extend(true, b.modalOptions, options);
+                $.extend(true, b.modalEvents, events);
+
                 //Initialize
-                b.init();
+                b.init(true);
 
                 $('#begard').addClass('begard-modal').removeClass('begard-standalone');
                 $('#begard-modal-back').removeClass('disabled');
+
+                if (b.modalOptions.select) {
+                    $('#begard-select-link').addClass('disabled').attr('disabled', 'disabled');
+                } else {
+                    $('#begard-select').addClass('disabled');
+                }
             },
 
             /**

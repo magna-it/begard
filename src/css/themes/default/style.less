@@ -19,7 +19,7 @@
 
         #begard-content {
             overflow: auto;
-            bottom: 0;
+            bottom: 5px;
         }
     }
 
@@ -51,6 +51,22 @@
         right: 0px;
         top: 100px;
         width: 300px;
+    }
+
+    #begard-close {
+        color: #4D4D4D;
+    }
+
+    #begard-select {
+        margin-top: 15px;
+        padding-top: 5px;
+        border-top: solid 1px #F9F9F9;
+        
+        #begard-select-link {
+            &.disabled {
+                display: inline-block;
+            }
+        }
     }
 }
 

@@ -21,6 +21,11 @@
             overflow: auto;
             bottom: 5px;
         }
+
+        #begard-details {
+            overflow: auto;
+            bottom: 5px;
+        }
     }
 
     #begard-header {
@@ -51,6 +56,17 @@
         right: 0px;
         top: 100px;
         width: 300px;
+
+        li {
+            word-wrap: break-word;
+        }
+
+        .begard-file-details-image {
+            list-style: none;
+            img {
+                max-width: 220px;
+            }
+        }
     }
 
     #begard-close {
@@ -61,10 +77,41 @@
         margin-top: 15px;
         padding-top: 5px;
         border-top: solid 1px #F9F9F9;
-        
+
         #begard-select-link {
             &.disabled {
                 display: inline-block;
+            }
+        }
+    }
+
+    #begard-files {
+        .begard-file.begard-file-has-image {
+            .icon { display: none; }
+            .begard-file-image {
+                position: relative;
+                height: 80px;
+                text-align: center;
+                overflow: hidden;
+                .centered {
+                    height: 100%;
+                    width: 100%;
+                    -ms-transform: translate(-50%, 50%);
+                    -wbkit-transform: translate(-50%, 50%);
+                    transform: translate(-50%, 50%);
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                }
+                img {
+                    max-height: 80px;
+                    -ms-transform: translate(50%, -50%);
+                    -webkit-transform: translate(50%, -50%);
+                    transform: translate(50%, -50%);
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                }
             }
         }
     }

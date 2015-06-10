@@ -10,6 +10,9 @@ gulp.task('default', ['uglify', 'less']);
 
 gulp.task('watch', function() {
     watch(['src/js/begard.js', 'src/css/themes/default/style.less'], function() {
+        var d = new Date();
+        console.log();
+        console.log('Generating in ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds());
         gulp.start('default');
     });
 });

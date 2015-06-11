@@ -149,13 +149,19 @@
                     dataType: "json",
                     cache: false
                 }).done(function(data) {
-                    var path = data.path;
-                    delete data.path;
+                    if (data.status !== 1) {
+                        b.showError(b.message);
+                    } else {
+                        var path = data.path;
+                        delete data.path;
 
-                    b.data[path] = data;
+                        b.data[path] = data;
 
-                    b.refreshVars(path);
-                    b.refreshView(path);
+                        b.refreshVars(path);
+                        b.refreshView(path);
+                    }
+                }).fail(function() {
+                    b.showError(b.options.defaultErrorMessage);
                 });
             },
 

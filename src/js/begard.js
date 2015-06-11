@@ -16,6 +16,7 @@
                 method: 'POST',
                 multiSelect: false,
                 defaultErrorMessage: 'An error occurred',
+                autoRefresh: false,
                 templates: {
                     directory: '<div class="begard-directory" data-path="{data-path}" data-index="{data-index}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{data-name}</li></ul></a></div>',
                     file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {data-extension}-ext"></i></li><li class="begard-file-image" class="disabled"><div class="centered"><img class="begard-file-image-src" src=""></div></li><li>{data-name}</li></ul></div>',
@@ -1021,7 +1022,10 @@
             needRefresh: function(path) {
                 delete b.data[path];
                 if (path === b.currentPath) {
-                    $('#begard-need-refresh').attr('data-path', b.currentPath).removeClass('disabled');
+                    if (b.options.autoRefresh)
+                        b.openDirectory(b.currentPath);
+                    else
+                        $('#begard-need-refresh').attr('data-path', b.currentPath).removeClass('disabled');
                 }
             },
 

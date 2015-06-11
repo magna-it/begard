@@ -1133,7 +1133,7 @@
              * Close begard when started as a modal
              */
             close: function () {
-
+                b.closeBegard();
             }
         };
     };

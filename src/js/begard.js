@@ -21,7 +21,7 @@
                     file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {data-extension}-ext"></i></li><li class="begard-file-image" class="disabled"><div class="centered"><img class="begard-file-image-src" src=""></div></li><li>{data-name}</li></ul></div>',
                     breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{data-name}</a></li>',
                     fileDetails: '<h4>Selected file details</h4><ul><li class="begard-file-details-image"><img class="begard-file-details-image-src" src=""></li><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>',
-                    uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled">An error occurred.</li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
+                    uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled"></li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
                 }
             },
 
@@ -149,8 +149,6 @@
                     dataType: "json",
                     cache: false
                 }).done(function(data) {
-                    console.clear();
-                    console.log(data);
                     var path = data.path;
                     delete data.path;
 
@@ -626,7 +624,7 @@
                     }
                 }).done(function(data) {
                     if (data.status !== 1) {
-                        b.failedUploadItem(file);
+                        b.failedUploadItem(file, data.message);
                     } else {
                         var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
                         uploadItem.addClass('begard-upload-item-succeed');
@@ -643,15 +641,23 @@
 
             /**
              * Run when a upload item failed in upload
+             *
              * @param {object} file File
              */
-            failedUploadItem: function(file) {
+            failedUploadItem: function(file, message) {
                 var uploadItem = $('.begard-upload-item[data-id="' + file.id + '"]');
-                uploadItem.addClass('begard-upload-item-failed').find('.begard-upload-error').removeClass('disabled');
+
+                if (typeof message !== 'undefined')
+                    uploadItem.addClass('begard-upload-item-failed').find('.begard-upload-error')
+                        .text(message).removeClass('disabled');
+                else
+                    uploadItem.addClass('begard-upload-item-failed').find('.begard-upload-error')
+                        .text(b.options.defaultErrorMessage).removeClass('disabled');
             },
 
             /**
              * Create html of upload item
+             *
              * @param {object} file File
              */
             createUploadItem: function(file) {
@@ -666,6 +672,7 @@
 
             /**
              * Refresh percent of upload item in html
+             *
              * @param {object} file File
              */
             refreshUploadItem: function(file) {
@@ -677,6 +684,7 @@
 
             /**
              * Close button event in upload item
+             *
              * @param {object} e
              * @param {object} self $(this) in fact
              */

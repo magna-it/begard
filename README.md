@@ -1,7 +1,7 @@
 # Begard
 
 Begard is a file manager for web clients.
-
+![](http://aparnet.ir/wp-content/uploads/2015/06/Begard.png)
 ## How to use
 
 * Install Begrad:

@@ -25,6 +25,7 @@
                     uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled"></li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
                 },
                 sendWith: {
+                    all: {},
                     getData: {},
                     copy: {},
                     move: {},
@@ -152,7 +153,7 @@
                     data: {
                         path: path,
                         requestType: 'info',
-                        extra: b.options.sendWith.getData
+                        extra: $.extend(true, {}, b.options.sendWith.getData, b.options.sendWith.all)
                     },
                     method: b.options.method,
                     dataType: "json",
@@ -739,7 +740,7 @@
                 var fileSelected = $('#begard-files .begard-selected');
                 var directorySelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'rename', extra: b.options.sendWith.rename};
+                b.willOperate = {requestType: 'operation', operation: 'rename', extra: $.extend(true, {}, b.options.sendWith.rename, b.options.sendWith.all)};
 
                 if (fileSelected.length === 1) {
                     var path = fileSelected.attr('data-path');
@@ -828,7 +829,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'delete', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.delete};
+                b.willOperate = {requestType: 'operation', operation: 'delete', path: b.currentPath, files: [], directories: [], extra: $.extend(true, {}, b.options.sendWith.delete, b.options.sendWith.all)};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
@@ -917,7 +918,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'copy', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.copy};
+                b.willOperate = {requestType: 'operation', operation: 'copy', path: b.currentPath, files: [], directories: [], extra: $.extend(true, {}, b.options.sendWith.copy, b.options.sendWith.all)};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
@@ -964,7 +965,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'move', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.move};
+                b.willOperate = {requestType: 'operation', operation: 'move', path: b.currentPath, files: [], directories: [], extra: $.extend(true, {}, b.options.sendWith.move, b.options.sendWith.all)};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');

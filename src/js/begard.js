@@ -23,6 +23,13 @@
                     breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{data-name}</a></li>',
                     fileDetails: '<h4>Selected file details</h4><ul><li class="begard-file-details-image"><img class="begard-file-details-image-src" src=""></li><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>',
                     uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled"></li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
+                },
+                sendWith: {
+                    getData: {},
+                    copy: {},
+                    move: {},
+                    delete: {},
+                    rename: {}
                 }
             },
 
@@ -144,7 +151,8 @@
                     url: b.options.remote,
                     data: {
                         path: path,
-                        requestType: 'info'
+                        requestType: 'info',
+                        extra: b.options.sendWith.getData
                     },
                     method: b.options.method,
                     dataType: "json",
@@ -731,7 +739,7 @@
                 var fileSelected = $('#begard-files .begard-selected');
                 var directorySelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'rename'};
+                b.willOperate = {requestType: 'operation', operation: 'rename', extra: b.options.sendWith.rename};
 
                 if (fileSelected.length === 1) {
                     var path = fileSelected.attr('data-path');
@@ -820,7 +828,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'delete', path: b.currentPath, files: [], directories: []};
+                b.willOperate = {requestType: 'operation', operation: 'delete', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.delete};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
@@ -909,7 +917,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'copy', path: b.currentPath, files: [], directories: []};
+                b.willOperate = {requestType: 'operation', operation: 'copy', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.copy};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');
@@ -956,7 +964,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                b.willOperate = {requestType: 'operation', operation: 'move', path: b.currentPath, files: [], directories: []};
+                b.willOperate = {requestType: 'operation', operation: 'move', path: b.currentPath, files: [], directories: [], extra: b.options.sendWith.move};
 
                 filesSelected.each(function() {
                     var path = $(this).attr('data-path');

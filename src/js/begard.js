@@ -26,7 +26,7 @@
                 },
                 sendWith: {
                     all: {},
-                    getData: {},
+                    info: {},
                     copy: {},
                     move: {},
                     delete: {},
@@ -147,13 +147,13 @@
              *
              * @param {string} path
              */
-            getData: function(path) {
+            getInfo: function(path) {
                 $.ajax({
                     url: b.options.remote,
                     data: {
                         path: path,
                         requestType: 'info',
-                        extra: $.extend(true, {}, b.options.sendWith.getData, b.options.sendWith.all)
+                        extra: $.extend(true, {}, b.options.sendWith.info, b.options.sendWith.all)
                     },
                     method: b.options.method,
                     dataType: "json",
@@ -391,7 +391,7 @@
                     b.refreshVars(path);
                     b.refreshView(path);
                 } else {
-                    b.getData(path);
+                    b.getInfo(path);
                 }
             },
 

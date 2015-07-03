@@ -19,9 +19,12 @@
                 autoRefresh: false,
                 templates: {
                     directory: '<div class="begard-directory" data-path="{data-path}" data-index="{data-index}"><a href="javascript:void(0)"><ul><li class="icon"><i class="fa fa-folder"></i></li><li>{data-name}</li></ul></a></div>',
+
+                    // Required file attributes for default theme: name, mime, size, extension
                     file: '<div class="begard-file" data-path="{data-path}" data-index="{data-index}"><ul><li class="icon"><i class="fa {data-extension}-ext"></i></li><li class="begard-file-image" class="disabled"><div class="centered"><img class="begard-file-image-src" src=""></div></li><li>{data-name}</li></ul></div>',
-                    breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{data-name}</a></li>',
                     fileDetails: '<h4>Selected file details</h4><ul><li class="begard-file-details-image"><img class="begard-file-details-image-src" src=""></li><li>Name: {data-name}</li><li>Extension: {data-extension}</li><li>Size: {data-size}</li></ul>',
+
+                    breadcrumb: '<li class="begard-crumb"><a href="#" class="begard-crumb-to" data-path="{data-path}">{data-name}</a></li>',
                     uploadList: '<div class="begard-upload-item" data-id="{data-id}"><ul><i class="begard-upload-close fa fa-times disabled"></i><li class="begard-upload-error disabled"></li><li class="begard-upload-name">{data-name}</li><li><div class="progress"><div class="progress-bar progress-bar-warning" role="progressbar" data-change-percent-width data-change-percent-text aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div></div></li></ul></div>'
                 },
                 sendWith: {
@@ -141,9 +144,15 @@
              *  {
              *      status: 1,
              *      path: '/',
-             *      files: [{name: 'file 1.txt', extension: 'txt', size: 15409}],
+             *      files: [{name: 'file 1.txt', mime: 'txt'}],
              *      directories: ['directory 1', 'directory 2']
              *  }
+             *
+             * In response:
+             *
+             *  files required attribute => name, mime
+             *  If file is image (detect by server) `preview` attribute used for display image
+             *  All file attributes replace in file and file detail template
              *
              * @param {string} path
              */
@@ -345,9 +354,10 @@
                     var file = b.data[filePath]['files'][fileIndex];
 
                     var template = b.options.templates.fileDetails;
-                    template = template.replace(new RegExp('{data-name}', 'g'), file.name);
-                    template = template.replace(new RegExp('{data-size}', 'g'), file.size);
-                    template = template.replace(new RegExp('{data-extension}', 'g'), file.extension);
+                    $.each(file, function(attr, value) {
+                        template = template.replace(new RegExp('{data-' + attr + '}', 'g'), value);
+                    });
+
 
                     // If file has a image for preview
                     if (file.hasOwnProperty('preview')) {
@@ -501,11 +511,12 @@
 
                     //Add file to html
                     var template = b.options.templates.file;
-                    template = template.replace(new RegExp('{data-name}', 'g'), file.name);
-                    template = template.replace(new RegExp('{data-size}', 'g'), file.size);
                     template = template.replace(new RegExp('{data-path}', 'g'), path);
                     template = template.replace(new RegExp('{data-index}', 'g'), index);
-                    template = template.replace(new RegExp('{data-extension}', 'g'), file.extension);
+
+                    $.each(file, function(attr, value) {
+                        template = template.replace(new RegExp('{data-' + attr + '}', 'g'), value);
+                    });
 
                     // If file has a image for preview
                     if (file.hasOwnProperty('preview')) {

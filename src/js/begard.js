@@ -34,16 +34,12 @@
                     move: {},
                     delete: {},
                     rename: {}
+                },
+                selectRules: {
+                    select: true,
+                    fileSelect: true,
+                    directorySelect: false
                 }
-            },
-
-            /**
-             * Options for modal view
-             */
-            modalOptions: {
-                select: true,
-                fileSelect: true,
-                directorySelect: false
             },
 
             /**
@@ -264,7 +260,7 @@
                 var filesSelected = $('#begard-files .begard-selected');
                 var directoriesSelected = $('#begard-directories .begard-selected');
 
-                if (b.isModal && b.modalOptions.select) {
+                if (b.isModal && b.options.selectRules.select) {
 
                     //First enable select link if any file or directory selected
                     if (filesSelected.length > 0 || directoriesSelected.length > 0) {
@@ -275,13 +271,13 @@
 
                     // Then if file select is denied and user selected a file
                     // disable select link
-                    if (filesSelected.length > 0 && !b.modalOptions.fileSelect) {
+                    if (filesSelected.length > 0 && !b.options.selectRules.fileSelect) {
                         $('#begard-select-link').addClass('disabled').attr('disabled');
                     }
 
                     // and if directory select is denied and user selected a directory
                     // disable select link
-                    if (directoriesSelected.length > 0 && !b.modalOptions.directorySelect) {
+                    if (directoriesSelected.length > 0 && !b.options.selectRules.directorySelect) {
                         $('#begard-select-link').addClass('disabled').attr('disabled');
                     }
                 }
@@ -1108,18 +1104,13 @@
         return begard = {
 
             /**
-             * Set configuration
+             * Start begard normally
              *
              * @param {object} options
              */
-            config: function(options) {
+            standalone: function(options) {
                 $.extend(true, b.options, options);
-            },
 
-            /**
-             * Start begard normally
-             */
-            standalone: function() {
                 //Initialize
                 b.init(false);
 
@@ -1131,9 +1122,12 @@
 
             /**
              * Start begard as a modal
+             *
+             * @param {object} options
+             * @param {object} events or callbacks
              */
             modal: function(options, events) {
-                $.extend(true, b.modalOptions, options);
+                $.extend(true, b.options, options);
                 $.extend(true, b.modalEvents, events);
 
                 //Initialize
@@ -1142,7 +1136,7 @@
                 $('#begard').addClass('begard-modal').removeClass('begard-standalone');
                 $('#begard-modal-back').removeClass('disabled');
 
-                if (b.modalOptions.select) {
+                if (b.options.selectRules.select) {
                     $('#begard-select-link').addClass('disabled').attr('disabled', 'disabled');
                 } else {
                     $('#begard-select').addClass('disabled');

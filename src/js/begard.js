@@ -38,6 +38,7 @@
                 selectRules: {
                     select: true,
                     fileSelect: true,
+                    fileAcceptedMimes: 'all',
                     directorySelect: false
                 }
             },
@@ -87,6 +88,15 @@
 
                 b.handleEvents();
                 b.openDirectory('/');
+
+                console.log(b.options.selectRules.fileAcceptedMimes);
+                if ($.isArray(b.options.selectRules.fileAcceptedMimes) && $.inArray('images', b.options.selectRules.fileAcceptedMimes) !== -1) {
+                    index = $.inArray('images', b.options.selectRules.fileAcceptedMimes);
+                    b.options.selectRules.fileAcceptedMimes[index] = 'image/jpeg';
+                    b.options.selectRules.fileAcceptedMimes.push('image/bmp');
+                    b.options.selectRules.fileAcceptedMimes.push('image/png');
+                    console.log(b.options.selectRules.fileAcceptedMimes);
+                }
 
                 b.disableOperations();
                 $('#begard-error').addClass('disabled');
@@ -269,10 +279,30 @@
                         $('#begard-select-link').addClass('disabled').attr('disabled');
                     }
 
-                    // Then if file select is denied and user selected a file
-                    // disable select link
-                    if (filesSelected.length > 0 && !b.options.selectRules.fileSelect) {
-                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                    // If file select is accepted
+                    if (b.options.selectRules.fileSelect) {
+                        // And any files selected
+                        if (filesSelected.length > 0) {
+                            // Check file selected mime
+                            if (b.options.selectRules.fileAcceptedMimes !== 'all' && $.isArray(b.options.selectRules.fileAcceptedMimes)) {
+                                $.each(filesSelected, function(index, file) {
+                                    var fileIndex = $(this).attr('data-index');
+                                    var filePath = $(this).attr('data-path');
+                                    var file = b.data[filePath]['files'][fileIndex];
+
+                                    if ($.inArray(file.mime, b.options.selectRules.fileAcceptedMimes) === -1) {
+                                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                                        return false;
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                    // If file select is denied
+                        // And any files selected
+                        if (filesSelected.length > 0) {
+                            $('#begard-select-link').addClass('disabled').attr('disabled');
+                        }
                     }
 
                     // and if directory select is denied and user selected a directory

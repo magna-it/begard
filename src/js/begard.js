@@ -89,13 +89,11 @@
                 b.handleEvents();
                 b.openDirectory('/');
 
-                console.log(b.options.selectRules.fileAcceptedMimes);
                 if ($.isArray(b.options.selectRules.fileAcceptedMimes) && $.inArray('images', b.options.selectRules.fileAcceptedMimes) !== -1) {
                     index = $.inArray('images', b.options.selectRules.fileAcceptedMimes);
                     b.options.selectRules.fileAcceptedMimes[index] = 'image/jpeg';
                     b.options.selectRules.fileAcceptedMimes.push('image/bmp');
                     b.options.selectRules.fileAcceptedMimes.push('image/png');
-                    console.log(b.options.selectRules.fileAcceptedMimes);
                 }
 
                 b.disableOperations();
@@ -1118,7 +1116,7 @@
 
                     filesSelected.each(function() {
                         var path = $(this).attr('data-path');
-                        selected.files.push(b.data[path]['files'][$(this).attr('data-index')].name);
+                        selected.files.push(b.data[path]['files'][$(this).attr('data-index')]);
                     });
 
                     directoriesSelected.each(function() {

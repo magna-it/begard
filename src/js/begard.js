@@ -1108,21 +1108,43 @@
              */
             selectEvent: function(e, self) {
                 if (b.modalEvents.afterSelect !== null) {
+                    var files = null, directories = null, path;
+
+                    path = b.currentPath;
+
                     var filesSelected = $('#begard-files .begard-selected');
+                    if (b.options.selectRules.fileSelect) {
+                        // If multiSelect option is enable, then return array
+                        if (b.options.multiSelect) {
+                            files = [];
+                            filesSelected.each(function() {
+                                var path = $(this).attr('data-path');
+                                files.push(b.data[path]['files'][$(this).attr('data-index')]);
+                            });
+                        } else {
+                        // Else, just return file object
+                            var path = filesSelected.attr('data-path');
+                            files = b.data[path]['files'][filesSelected.attr('data-index')];
+                        }
+                    }
+
                     var directoriesSelected = $('#begard-directories .begard-selected');
+                    if (b.options.selectRules.directorySelect) {
+                        // If multiSelect option is enable, then return array
+                        if (b.options.multiSelect) {
+                            directories = [];
+                            directoriesSelected.each(function() {
+                                var path = $(this).attr('data-path');
+                                directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
+                            });
+                        } else {
+                        // Else, just return directory object
+                            var path = directoriesSelected.attr('data-path');
+                            directories = b.data[path]['directories'][directoriesSelected.attr('data-index')];
+                        }
+                    }
 
-                    var selected = {path: b.currentPath, files: [], directories: []};
-
-                    filesSelected.each(function() {
-                        var path = $(this).attr('data-path');
-                        selected.files.push(b.data[path]['files'][$(this).attr('data-index')]);
-                    });
-
-                    directoriesSelected.each(function() {
-                        var path = $(this).attr('data-path');
-                        selected.directories.push(b.data[path]['directories'][$(this).attr('data-index')]);
-                    });
-                    b.modalEvents.afterSelect(selected);
+                    b.modalEvents.afterSelect(path, files, directories);
                 }
                 b.closeBegard();
             }

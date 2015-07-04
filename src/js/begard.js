@@ -86,7 +86,6 @@
             init: function(isModal) {
                 b.isModal = isModal;
 
-                b.handleEvents();
                 b.openDirectory('/');
 
                 if ($.isArray(b.options.selectRules.fileAcceptedMimes) && $.inArray('images', b.options.selectRules.fileAcceptedMimes) !== -1) {
@@ -1130,6 +1129,13 @@
         };
 
         return begard = {
+
+            /**
+             * Initialize begard, call this method one time per page load
+             */
+            init: function() {
+                b.handleEvents();
+            },
 
             /**
              * Start begard normally

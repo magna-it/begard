@@ -177,6 +177,17 @@ Example of response:
 }
 ```
 
+If file is image you can pass ```preview``` to show image thumbnail. eg:
+
+```
+{
+    path: '/',
+    files: [{name: 'file 1.txt', mime: 'text-x/php', preview: 'http://localhost/test/preview.png'}, {...}, {...}],
+    directories: ['directory 1', 'directory 2'],
+    status: 1
+}
+```
+
 ### upload
 
 Example of upload request:

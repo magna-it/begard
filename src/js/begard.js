@@ -47,7 +47,14 @@
              * Event for modal view
              */
             modalEvents: {
-                afterSelect: null
+                // Send files and directory selected => (path, files, directories [, customField])
+                afterSelect: null,
+
+                // Add custom html to sidebar, when select button is active this custom fields diplay
+                addCustomField: null,
+
+                // When user click on select button, every thing this event returned, send with afterSelect event
+                processCustomField: null
             },
 
             /**
@@ -97,6 +104,10 @@
 
                 b.disableOperations();
                 $('#begard-error').addClass('disabled');
+                if (b.isModal && b.modalEvents.addCustomField !== null) {
+                    $('#begard-custom-select').children().remove();
+                    $('#begard-custom-select').append(b.modalEvents.addCustomField);
+                }
             },
 
             /**
@@ -269,11 +280,13 @@
 
                 if (b.isModal && b.options.selectRules.select) {
 
+                    var enableSelect;
+
                     //First enable select link if any file or directory selected
                     if (filesSelected.length > 0 || directoriesSelected.length > 0) {
-                        $('#begard-select-link').removeClass('disabled').removeAttr('disabled');
+                        enableSelect = true;
                     } else {
-                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                        enableSelect = false;
                     }
 
                     // If file select is accepted
@@ -288,7 +301,7 @@
                                     var file = b.data[filePath]['files'][fileIndex];
 
                                     if ($.inArray(file.mime, b.options.selectRules.fileAcceptedMimes) === -1) {
-                                        $('#begard-select-link').addClass('disabled').attr('disabled');
+                                        enableSelect = false;
                                         return false;
                                     }
                                 });
@@ -298,14 +311,22 @@
                     // If file select is denied
                         // And any files selected
                         if (filesSelected.length > 0) {
-                            $('#begard-select-link').addClass('disabled').attr('disabled');
+                            enableSelect = false;
                         }
                     }
 
                     // and if directory select is denied and user selected a directory
                     // disable select link
                     if (directoriesSelected.length > 0 && !b.options.selectRules.directorySelect) {
+                        enableSelect = false;
+                    }
+
+                    if (enableSelect) {
+                        $('#begard-select-link').removeClass('disabled').removeAttr('disabled');
+                        $('#begard-custom-select').removeClass('disabled');
+                    } else {
                         $('#begard-select-link').addClass('disabled').attr('disabled');
+                        $('#begard-custom-select').addClass('disabled');
                     }
                 }
             },
@@ -1144,7 +1165,12 @@
                         }
                     }
 
-                    b.modalEvents.afterSelect(path, files, directories);
+                    var customField = null;
+                    if (b.modalEvents.processCustomField !== null) {
+                        customField = b.modalEvents.processCustomField();
+                    }
+
+                    b.modalEvents.afterSelect(path, files, directories, customField);
                 }
                 b.closeBegard();
             }
@@ -1174,6 +1200,7 @@
                 $('#begard').addClass('begard-standalone').removeClass('begard-modal');
                 $('#begard-modal-back').addClass('disabled');
                 $('#begard-select').addClass('disabled');
+                $('#begard-custom-select').addClass('disabled');
             },
 
             /**
@@ -1197,6 +1224,7 @@
                 } else {
                     $('#begard-select').addClass('disabled');
                 }
+                $('#begard-custom-select').addClass('disabled');
             },
 
             /**

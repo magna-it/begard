@@ -6,6 +6,24 @@
 
     &.begard-standalone {
         display: block;
+
+        #begard-addressbar {
+            margin: 5px 0;
+        }
+
+        #begard-content {
+            width: 80%;
+            float: left;
+            .begard-inner {
+                margin-right: 5px;
+            }
+        }
+
+        #begard-details {
+            width: 20%;
+            float: left;
+        }
+
     }
 
     &.begard-modal {
@@ -26,37 +44,39 @@
             overflow: auto;
             bottom: 5px;
         }
-    }
 
-    #begard-header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 54px;
-    }
+        #begard-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 54px;
+        }
 
-    #begard-addressbar {
-        position: absolute;
-        top: 59px;
-        left: 0;
-        right: 0;
-        height: 36px;
-    }
+        #begard-addressbar {
+            position: absolute;
+            top: 59px;
+            left: 0;
+            right: 0;
+            height: 36px;
+        }
 
-    #begard-content {
-        position: absolute;
-        top: 100px;
-        left: 0;
-        right: 305px;
+        #begard-content {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 305px;
+        }
+
+        #begard-details {
+            position: absolute;
+            right: 0px;
+            top: 100px;
+            width: 300px;
+        }
     }
 
     #begard-details {
-        position: absolute;
-        right: 0px;
-        top: 100px;
-        width: 300px;
-
         li {
             word-wrap: break-word;
         }
